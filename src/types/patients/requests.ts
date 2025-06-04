@@ -1,5 +1,5 @@
 import { GenderType } from '@/constants';
-import { CreateUserRequest } from '../auth/requests';
+// import { CreateUserRequest } from '../auth/requests';
 
 export interface CreatePatientRequest {
   name: string;
@@ -9,7 +9,7 @@ export interface CreatePatientRequest {
   phoneNumber: string;
   email: string;
   currentHealthStatus: string;
-  userData: CreateUserRequest;
+  // userData: CreateUserRequest;
 }
 
 export interface UpdatePatientRequest {
