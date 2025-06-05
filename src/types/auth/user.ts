@@ -1,16 +1,7 @@
-import { BaseEntity } from '../core/api';
+import { Role } from './roles';
 
-// User Types
-export interface User extends BaseEntity {
+export interface AuthUser {
+  id: number | string;
   username: string;
-  roles: UserRole[];
-}
-
-export interface UserRole {
-  id: number;
-  role: {
-    id: number;
-    name: string;
-    description?: string;
-  };
+  roles: Role[];
 }
