@@ -1,10 +1,11 @@
 import React from 'react';
 import { 
   CalendarDaysIcon, 
-  UsersIcon,
-  ArrowPathIcon 
+  ArrowPathIcon,
+  Bars3Icon
 } from '@heroicons/react/24/outline';
 import MetricCard from '@/components/ui/MetricCard';
+import UserDropdown from '@/components/ui/UserDropdown';
 import TodayAppointments from '@/components/dashboard/TodayAppointments';
 import NextAppointment from '@/components/dashboard/NextAppointment';
 import QuickActions from '@/components/dashboard/QuickActions';
@@ -19,8 +20,8 @@ const DoctorDashboard: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <ArrowPathIcon className="mx-auto h-12 w-12 text-blue-500 animate-spin" />
-          <p className="mt-2 text-gray-600">Cargando dashboard...</p>
+          <ArrowPathIcon className="mx-auto h-12 w-12 text-clinic-500 animate-spin" />
+          <p className="mt-4 text-lg font-medium text-gray-600">Cargando dashboard...</p>
         </div>
       </div>
     );
@@ -30,11 +31,12 @@ const DoctorDashboard: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-md">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-            <p className="text-red-800 mb-4">{error}</p>
+          <div className="bg-white border border-red-200 rounded-xl p-8 shadow-soft">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Error al cargar</h3>
+            <p className="text-red-600 mb-6">{error}</p>
             <button
               onClick={refreshData}
-              className="btn btn-primary"
+              className="bg-clinic-600 text-white px-6 py-2 rounded-lg hover:bg-clinic-700 transition-colors duration-200"
             >
               Intentar de nuevo
             </button>
@@ -50,79 +52,124 @@ const DoctorDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-3">
-                <img
-                  src="/pharmacy.png"
-                  alt="OncoLogic"
-                  className="h-8 w-8"
-                />
-                <h1 className="text-xl font-semibold text-blue-600">OncoLogic</h1>
+                <div className="h-10 w-10 bg-clinic-500 rounded-lg flex items-center justify-center">
+                  <img
+                    src="/pharmacy.png"
+                    alt="OncoLogic"
+                    className="h-7 w-7 filter brightness-0 invert"
+                  />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-clinic-600">OncoLogic</h1>
+                  <p className="text-xs text-gray-500">Sistema de Gestión Clínica</p>
+                </div>
               </div>
+              
+              <nav className="hidden md:flex space-x-1">
+                <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-clinic-600 bg-clinic-50 rounded-lg">
+                  <Bars3Icon className="h-4 w-4" />
+                  <span>Dashboard</span>
+                </button>
+              </nav>
             </div>
             
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
-                {currentUser?.username || 'Doctor'}
-              </span>
               <button
-                onClick={authService.logout}
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                onClick={refreshData}
+                className="p-2 text-gray-400 hover:text-clinic-600 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                title="Actualizar datos"
               >
-                Cerrar Sesión
+                <ArrowPathIcon className="h-5 w-5" />
               </button>
+              
+              <UserDropdown username={currentUser?.username || 'Doctor'} />
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Métricas principales */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <MetricCard
-            value={metrics.appointmentsToday}
-            label="Citas Hoy"
-            color="blue"
-            icon={<CalendarDaysIcon className="h-6 w-6" />}
-          />
-          <MetricCard
-            value={metrics.activePatients}
-            label="Pacientes"
-            color="green"
-            icon={<UsersIcon className="h-6 w-6" />}
-          />
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">
+            ¡Bienvenido, Dr. {currentUser?.username}!
+          </h2>
+          <p className="text-gray-600 mt-1">Aquí tiene un resumen de su jornada</p>
         </div>
 
-        {/* Fecha actual */}
-        <div className="text-right mb-6">
-          <div className="text-3xl font-bold text-blue-600">
-            {metrics.currentDate}
-          </div>
-          <div className="text-sm text-gray-600">
-            {new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}<br />
-            {metrics.currentDay}
-          </div>
-        </div>
-
-        {/* Layout principal */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Columna izquierda - Citas de hoy */}
-          <div className="lg:col-span-2">
-            <TodayAppointments appointments={todayAppointments} />
-          </div>
-
-          {/* Columna derecha */}
+        {/* Layout principal con alturas iguales */}
+        <div className="grid grid-cols-2 lg:grid-cols-2 gap-6 mb-8 items-start">
+          {/* Columna izquierda: 3 cards apiladas */}
           <div className="space-y-6">
-            {/* Próxima cita */}
-            <NextAppointment nextAppointment={nextAppointment} />
+            {/* Card 1: Citas de hoy */}
+            <MetricCard
+              value={metrics.appointmentsToday}
+              label="Citas de hoy"
+              color="clinic"
+              icon={<CalendarDaysIcon className="h-6 w-6" />}
+            />
+            
+            {/* Card 2: Fecha */}
+            <div className="bg-white rounded-xl shadow-card border border-gray-200 p-4 text-center">
+              <div className="text-2xl font-bold text-clinic-600 mb-1">
+                {metrics.currentDate}
+              </div>
+              <div className="text-sm text-gray-600">
+                {new Date().toLocaleDateString('es-ES', { 
+                  month: 'long', 
+                  year: 'numeric' 
+                })}
+              </div>
+              <div className="text-xs text-clinic-500 font-medium mt-1">
+                {metrics.currentDay}
+              </div>
+            </div>
 
-            {/* Acciones rápidas */}
+            {/* Card 3: Acciones rápidas */}
             <QuickActions />
+          </div>
+
+          {/* Columna derecha: Próxima cita con altura completa */}
+          <div className="h-full">
+            <div className="h-full">
+              <NextAppointment nextAppointment={nextAppointment} />
+            </div>
+          </div>
+        </div>
+
+        {/* Sección de citas de hoy */}
+        <div className="mb-6">
+          <TodayAppointments appointments={todayAppointments} />
+        </div>
+
+        {/* Estadísticas del día */}
+        <div className="bg-white rounded-xl shadow-card border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Estadísticas del Día</h3>
+          <div className="flex justify-center">
+            <div className="grid grid-cols-3 gap-8 text-center max-w-md">
+              <div>
+                <div className="text-2xl font-bold text-clinic-600">
+                  {todayAppointments.filter(a => a.status === 'COMPLETED').length}
+                </div>
+                <div className="text-sm text-gray-600">Completadas</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-green-600">
+                  {todayAppointments.filter(a => a.status === 'IN_PROGRESS').length}
+                </div>
+                <div className="text-sm text-gray-600">En progreso</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-yellow-600">
+                  {todayAppointments.filter(a => a.status === 'SCHEDULED').length}
+                </div>
+                <div className="text-sm text-gray-600">Programadas</div>
+              </div>
+            </div>
           </div>
         </div>
       </main>

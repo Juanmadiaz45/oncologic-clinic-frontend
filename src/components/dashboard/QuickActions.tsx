@@ -1,9 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  PlusIcon, 
   UsersIcon, 
-  BeakerIcon
+  CalendarIcon,
+  BeakerIcon,
+  BoltIcon
 } from '@heroicons/react/24/outline';
 import { ROUTES } from '@/constants';
 
@@ -12,7 +13,7 @@ interface QuickAction {
   label: string;
   icon: React.ReactNode;
   route: string;
-  color: 'blue' | 'green' | 'purple' | 'gray';
+  color: 'clinic' | 'green' | 'purple';
 }
 
 const QuickActions: React.FC = () => {
@@ -20,45 +21,30 @@ const QuickActions: React.FC = () => {
 
   const actions: QuickAction[] = [
     {
-      id: 'new-consultation',
-      label: 'Crear paciente',
-      icon: <PlusIcon className="h-6 w-6" />,
-      route: ROUTES.APPOINTMENT_CREATE,
-      color: 'blue'
-    },
-    {
       id: 'view-patients',
       label: 'Ver Pacientes',
-      icon: <UsersIcon className="h-6 w-6" />,
+      icon: <UsersIcon className="h-5 w-5" />,
       route: ROUTES.PATIENTS,
       color: 'green'
-    },
-    {
-      id: 'schedule-an-appointment',
-      label: 'Agendar cita',
-      icon: <BeakerIcon className="h-6 w-6" />,
-      route: ROUTES.RESULTS,
-      color: 'purple'
-    },
+    }
   ];
 
   const getColorClasses = (color: QuickAction['color']) => {
     const colorConfig = {
-      blue: {
-        bg: 'bg-blue-600 hover:bg-blue-700',
-        text: 'text-white'
+      clinic: {
+        bg: 'bg-gradient-to-br from-clinic-500 to-clinic-600 hover:from-clinic-600 hover:to-clinic-700',
+        text: 'text-white',
+        shadow: 'shadow-clinic-500/25'
       },
       green: {
-        bg: 'bg-green-600 hover:bg-green-700',
-        text: 'text-white'
+        bg: 'bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700',
+        text: 'text-white',
+        shadow: 'shadow-green-500/25'
       },
       purple: {
-        bg: 'bg-purple-600 hover:bg-purple-700',
-        text: 'text-white'
-      },
-      gray: {
-        bg: 'bg-gray-600 hover:bg-gray-700',
-        text: 'text-white'
+        bg: 'bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700',
+        text: 'text-white',
+        shadow: 'shadow-purple-500/25'
       }
     };
     return colorConfig[color];
@@ -69,23 +55,28 @@ const QuickActions: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-900">Acciones Rápidas</h3>
+    <div className="bg-white rounded-xl shadow-card border border-gray-200 p-6">
+      <div className="flex items-center space-x-2 mb-4">
+        <BoltIcon className="h-5 w-5 text-clinic-500" />
+        <h3 className="text-lg font-semibold text-gray-900">Acciones Rápidas</h3>
+      </div>
       
-      <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-3">
         {actions.map(action => {
           const colorClasses = getColorClasses(action.color);
           return (
             <button
               key={action.id}
               onClick={() => handleActionClick(action.route)}
-              className={`${colorClasses.bg} ${colorClasses.text} p-4 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+              className={`${colorClasses.bg} ${colorClasses.text} w-full p-3 rounded-lg shadow-lg ${colorClasses.shadow} transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-clinic-500 group`}
             >
-              <div className="flex flex-col items-center space-y-2">
-                {action.icon}
-                <span className="text-sm font-medium text-center">
+              <div className="flex items-center space-x-3">
+                <div className="p-1 bg-white/20 rounded group-hover:bg-white/30 transition-colors duration-200">
+                  {action.icon}
+                </div>
+                <div className="text-sm font-semibold">
                   {action.label}
-                </span>
+                </div>
               </div>
             </button>
           );

@@ -13,5 +13,8 @@ export * from './auth/user';
 export * from './patients';
 export * from './patients/requests';
 
+// Appointments
+export * from './appointments/tasks';
+
 // Dashboard
 export * from './dashboard';

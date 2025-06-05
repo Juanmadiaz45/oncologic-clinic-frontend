@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ClockIcon } from '@heroicons/react/24/outline';
 import { AppointmentSummary } from '@/types/dashboard';
 
 interface TodayAppointmentsProps {
@@ -23,7 +24,7 @@ const TodayAppointments: React.FC<TodayAppointmentsProps> = ({ appointments }) =
 
   const getStatusBadge = (status: AppointmentSummary['status']) => {
     const statusConfig = {
-      SCHEDULED: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Programada' },
+      SCHEDULED: { bg: 'bg-clinic-100', text: 'text-clinic-800', label: 'Programada' },
       IN_PROGRESS: { bg: 'bg-green-100', text: 'text-green-800', label: 'En curso' },
       COMPLETED: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Completada' },
       CANCELLED: { bg: 'bg-red-100', text: 'text-red-800', label: 'Cancelada' }
@@ -31,7 +32,7 @@ const TodayAppointments: React.FC<TodayAppointmentsProps> = ({ appointments }) =
 
     const config = statusConfig[status];
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
+      <span className={`px-3 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
         {config.label}
       </span>
     );
@@ -44,59 +45,74 @@ const TodayAppointments: React.FC<TodayAppointmentsProps> = ({ appointments }) =
   ];
 
   return (
-    <div className="card p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Citas de Hoy</h3>
+    <div className="bg-white rounded-xl shadow-card border border-gray-200 overflow-hidden">
+      <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <h3 className="text-lg font-semibold text-gray-900">Citas de Hoy</h3>
+      </div>
       
-      {/* Tabs */}
-      <div className="border-b border-gray-200 mb-4">
-        <nav className="flex space-x-8">
+      <div className="border-b border-gray-200 bg-white">
+        <nav className="flex px-6">
           {tabs.map(tab => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+              className={`py-4 px-4 border-b-2 font-medium text-sm transition-colors duration-200 relative ${
                 activeTab === tab.key
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-clinic-500 text-clinic-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              {tab.label}
-              <span className="ml-2 bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs">
-                {tab.count}
+              <span className="flex items-center space-x-2">
+                <span>{tab.label}</span>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${
+                  activeTab === tab.key 
+                    ? 'bg-clinic-100 text-clinic-600' 
+                    : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {tab.count}
+                </span>
               </span>
             </button>
           ))}
         </nav>
       </div>
 
-      {/* Appointments List */}
-      <div className="space-y-3">
+      <div className="divide-y divide-gray-100">
         {filteredAppointments.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <p>No hay citas para mostrar</p>
+          <div className="text-center py-12 text-gray-500">
+            <ClockIcon className="mx-auto h-12 w-12 text-gray-300 mb-3" />
+            <p className="text-lg font-medium text-gray-400">No hay citas para mostrar</p>
+            <p className="text-sm text-gray-400 mt-1">Las citas aparecerán aquí cuando estén programadas</p>
           </div>
         ) : (
           filteredAppointments.map(appointment => (
             <div
               key={appointment.id}
-              className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+              className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors duration-200"
             >
-              <div className="flex items-center space-x-4">
-                <div className="text-sm font-medium text-blue-600 min-w-[60px]">
+              <div className="flex items-center space-x-4 flex-1">
+                <div className="text-lg font-semibold text-clinic-600 min-w-[80px]">
                   {appointment.time}
                 </div>
-                <div>
-                  <div className="font-medium text-gray-900">
+
+                <div className="flex-1">
+                  <div className="font-medium text-gray-900 text-lg">
                     {appointment.patientName}
                   </div>
-                  <div className="text-sm text-gray-500">
-                    {appointment.appointmentType}
-                    {appointment.office && ` • ${appointment.office}`}
+                  <div className="text-sm text-gray-500 flex items-center space-x-2">
+                    <span>{appointment.appointmentType}</span>
+                    {appointment.office && (
+                      <>
+                        <span>•</span>
+                        <span>{appointment.office}</span>
+                      </>
+                    )}
                   </div>
                 </div>
-              </div>
-              <div>
-                {getStatusBadge(appointment.status)}
+
+                <div className="flex-shrink-0">
+                  {getStatusBadge(appointment.status)}
+                </div>
               </div>
             </div>
           ))
