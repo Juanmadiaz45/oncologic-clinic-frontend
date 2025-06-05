@@ -88,13 +88,13 @@ class DashboardService {
       // CORREGIDO: Agregar /api/ al inicio
       const nextAppointment = await api.get<BackendNextAppointment>('/doctor-dashboard/appointments/next');
       return nextAppointment;
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Si no hay próxima cita, el backend devuelve 404, lo cual es normal
-      if (error.status === 404) {
-        return null;
+      if (error instanceof Error) {
+        console.error('Error fetching next appointment:', error);
+        throw new Error('No se pudo obtener la próxima cita');
       }
-      console.error('Error fetching next appointment:', error);
-      throw new Error('No se pudo obtener la próxima cita');
+      throw error;
     }
   }
 
@@ -119,11 +119,11 @@ class DashboardService {
   }
 
   // Método deprecado pero mantenido para compatibilidad
-  async updateTaskStatus(taskId: number, completed: boolean): Promise<void> {
+  /*async updateTaskStatus(taskId: number, completed: boolean): Promise<void> {
     console.warn('updateTaskStatus is deprecated - pending tasks were removed');
-  }
+  }*/
 
-  async createQuickAppointment(appointmentData: any): Promise<void> {
+  async createQuickAppointment(appointmentData: unknown): Promise<void> {
     try {
       await api.post('/medical-appointments', appointmentData);
     } catch (error) {

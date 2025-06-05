@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   PlusIcon, 
   UsersIcon, 
-  BeakerIcon, 
-  DocumentTextIcon 
+  BeakerIcon
 } from '@heroicons/react/24/outline';
 import { ROUTES } from '@/constants';
 
