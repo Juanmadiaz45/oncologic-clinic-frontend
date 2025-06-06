@@ -23,7 +23,6 @@ import {
   DoctorDetailPage,
   AdministrativeDetailPage,
 } from '@/pages/staff';
-import { ROUTES } from '@/constants';
 import DoctorDashboard from '@/pages/dashboard/DoctorDashboard';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AppointmentStep1 from '@/pages/appointments/create/AppointmentStep1';
