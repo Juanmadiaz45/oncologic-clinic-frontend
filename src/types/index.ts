@@ -11,4 +11,6 @@ export * from './auth/user';
 
 // Patients
 export * from './patients';
-export * from './patients/requests';
+// export * from './patients/requests';
+
+export * from './personal';

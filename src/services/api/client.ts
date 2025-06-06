@@ -20,13 +20,25 @@ let authToken: string | null = null;
 
 export const setAuthToken = (token: string | null) => {
   authToken = token;
+  console.log('Token configurado:', token ? 'Sí' : 'No');
 };
 
 export const getAuthToken = () => authToken;
 
 export const clearAuthToken = () => {
   authToken = null;
+  console.log('Token limpiado');
 };
+
+const initializeToken = () => {
+  const storedToken = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+  if (storedToken) {
+    setAuthToken(storedToken);
+    console.log('Token restaurado desde storage');
+  }
+};
+
+initializeToken();
 
 // Request interceptor
 apiClient.interceptors.request.use(
@@ -34,6 +46,9 @@ apiClient.interceptors.request.use(
     // Add auth token to requests
     if (authToken) {
       config.headers.Authorization = `Bearer ${authToken}`;
+      console.log('Request con Authorization header:', config.url);
+    } else {
+      console.log('Request SIN Authorization header:', config.url);
     }
 
     // Add request timestamp for debugging
@@ -56,7 +71,7 @@ apiClient.interceptors.response.use(
       const duration =
         endTime.getTime() - response.config.metadata.startTime.getTime();
       console.log(
-        `API Response: ${response.config.method?.toUpperCase()} ${response.config.url} - ${duration}ms`
+        `API Response: ${response.config.method?.toUpperCase()} ${response.config.url} - ${duration}ms - ${response.status}`
       );
     }
 
@@ -67,10 +82,16 @@ apiClient.interceptors.response.use(
     if (error.response) {
       const { status, data } = error.response;
 
+      console.error(`API Error ${status}:`, error.config?.url, data);
+
       switch (status) {
         case 401:
           // Unauthorized - clear token and redirect to login
+          console.log('401 Unauthorized - limpiando token y redirigiendo');
           clearAuthToken();
+          localStorage.removeItem('auth_token');
+          sessionStorage.removeItem('auth_token');
+          
           if (window.location.pathname !== '/login') {
             window.location.href = '/login';
           }
@@ -112,6 +133,7 @@ apiClient.interceptors.response.use(
       return Promise.reject(apiError);
     } else if (error.request) {
       // Network error
+      console.error('Network error:', error.message);
       const networkError: ApiError = {
         message: MESSAGES.ERROR.NETWORK,
         status: 0,
@@ -122,6 +144,7 @@ apiClient.interceptors.response.use(
       return Promise.reject(networkError);
     } else {
       // Something else happened
+      console.error('Unknown error:', error.message);
       const unknownError: ApiError = {
         message: error.message || 'Unknown error occurred',
         status: 0,
@@ -177,12 +200,12 @@ export const api = {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      onUploadProgress: progressEvent_1 => {
-        if (onProgress && progressEvent_1.total) {
-          const progress_1 = Math.round(
-            (progressEvent_1.loaded * 100) / progressEvent_1.total
+      onUploadProgress: progressEvent => {
+        if (onProgress && progressEvent.total) {
+          const progress = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
           );
-          onProgress(progress_1);
+          onProgress(progress);
         }
       },
     });
