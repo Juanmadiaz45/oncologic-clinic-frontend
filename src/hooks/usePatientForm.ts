@@ -125,7 +125,7 @@ export const usePatientForm = (props: UsePatientFormProps) => {
     try {
       if (isCreateMode(props) && isPatientFormData(formData)) {
         // Creation mode
-        const { username, password, confirmPassword, roleIds, ...patientData } = formData;
+        const { username, password, roleIds, ...patientData } = formData;
         const submitData: CreatePatientRequest = {
           ...patientData,
           userData: {
@@ -137,7 +137,7 @@ export const usePatientForm = (props: UsePatientFormProps) => {
         await props.onSubmit(submitData);
       } else if (isEditMode(props)) {
         // Edit mode
-        const { id, ...patientData } = formData as PatientEditFormData;
+        const { ...patientData } = formData as PatientEditFormData;
         const submitData: UpdatePatientRequest = patientData;
         await props.onSubmit(submitData);
       }

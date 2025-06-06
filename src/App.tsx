@@ -1,9 +1,11 @@
+// src/App.tsx
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
 } from 'react-router-dom';
+import { useEffect } from 'react';
 import LoginPage from '@/pages/auth/LoginPage';
 import {
   PatientListPage,
@@ -21,8 +23,17 @@ import {
   AdministrativeDetailPage
 } from '@/pages/staff';
 import { ROUTES } from '@/constants';
+import DoctorDashboard from '@/pages/dashboard/DoctorDashboard';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import authService from '@/services/auth/authService';
 
 function App() {
+  useEffect(() => {
+    // Initialize auth state from stored token
+    const initialized = authService.initializeFromStoredToken();
+    console.log('App initialized from token:', initialized);
+  }, []);
+
   return (
     <Router>
       <div className="App">
@@ -50,38 +61,39 @@ function App() {
           <Route path="/staff/administrative/:id/edit" element={<AdministrativeEditPage />} />
           <Route path="/staff/administrative/:id" element={<AdministrativeDetailPage />} />
 
-          {/* Default redirect to login */}
+          {/* Protected Routes */}
           <Route
-            path={ROUTES.HOME}
-            element={<Navigate to={ROUTES.LOGIN} replace />}
+            path="/dashboard"
+            element={
+              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
+                <DoctorDashboard />
+              </ProtectedRoute>
+            }
           />
 
           {/* Dashboard with navigation */}
           <Route
-            path={ROUTES.DASHBOARD}
+            path="/"
             element={
-              <div className="p-8 text-center">
-                <h1 className="text-2xl font-bold mb-4">Dashboard - Sistema OncoLogic</h1>
-                <div className="space-x-4">
-                  <a 
-                    href={ROUTES.PATIENTS}
-                    className="btn btn-primary"
-                  >
-                    Ver Pacientes
-                  </a>
-                  <a 
-                    href="/staff/personal"
-                    className="btn btn-secondary"
-                  >
-                    Ver Personal
-                  </a>
-                </div>
-              </div>
+              authService.isAuthenticated() ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <Navigate to="/login" replace />
+              )
             }
           />
 
           {/* 404 fallback */}
-          <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />
+          <Route 
+            path="*" 
+            element={
+              authService.isAuthenticated() ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            } 
+          />
         </Routes>
       </div>
     </Router>

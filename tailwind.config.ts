@@ -7,6 +7,19 @@ export default {
   theme: {
     extend: {
       colors: {
+        clinic: {
+          50: '#f0f8fd',
+          100: '#e1f0fa',
+          200: '#bde0f5',
+          300: '#83c9ed',
+          400: '#41afe1',
+          500: '#2f93cd', // Color principal #2f93cd
+          600: '#1e7bb8',
+          700: '#1a6395',
+          800: '#1a537b',
+          900: '#1b4566',
+          950: '#122c44',
+        },
         primary: {
           50: '#f0f9ff',
           500: '#3b82f6',

@@ -9,24 +9,43 @@ import {
   PersonalType
 } from '@/types/personal';
 
-const isDoctorCreateData = (data: any): data is DoctorFormData => {
-  return 'medicalLicenseNumber' in data && 'specialityIds' in data && 'username' in data && 'password' in data;
+const isDoctorCreateData = (data: unknown): data is DoctorFormData => {
+  return typeof data === 'object' && data !== null &&
+    'medicalLicenseNumber' in data &&
+    'specialityIds' in data &&
+    'username' in data &&
+    'password' in data;
 };
 
-const isDoctorEditData = (data: any): data is DoctorEditFormData => {
-  return 'medicalLicenseNumber' in data && 'specialityIds' in data && 'id' in data && !('username' in data);
+const isDoctorEditData = (data: unknown): data is DoctorEditFormData => {
+  return typeof data === 'object' && data !== null &&
+    'medicalLicenseNumber' in data &&
+    'specialityIds' in data &&
+    'id' in data &&
+    !('username' in data);
 };
 
-const isAdministrativeCreateData = (data: any): data is AdministrativeFormData => {
-  return 'position' in data && 'department' in data && 'username' in data && 'password' in data;
+const isAdministrativeCreateData = (data: unknown): data is AdministrativeFormData => {
+  return typeof data === 'object' && data !== null &&
+    'position' in data &&
+    'department' in data &&
+    'username' in data &&
+    'password' in data;
 };
 
-const isAdministrativeEditData = (data: any): data is AdministrativeEditFormData => {
-  return 'position' in data && 'department' in data && 'id' in data && !('username' in data);
+const isAdministrativeEditData = (data: unknown): data is AdministrativeEditFormData => {
+  return typeof data === 'object' && data !== null &&
+    'position' in data &&
+    'department' in data &&
+    'id' in data &&
+    !('username' in data);
 };
 
-const hasUserCredentials = (data: any): data is (DoctorFormData | AdministrativeFormData) => {
-  return 'username' in data && 'password' in data && 'confirmPassword' in data;
+const hasUserCredentials = (data: unknown): data is (DoctorFormData | AdministrativeFormData) => {
+  return typeof data === 'object' && data !== null &&
+    'username' in data &&
+    'password' in data &&
+    'confirmPassword' in data;
 };
 
 interface UseDoctorCreateFormProps {
@@ -185,8 +204,7 @@ export const usePersonalForm = (props: UsePersonalFormProps) => {
         if (isDoctorCreateData(formData)) {
           const { 
             username, 
-            password, 
-            confirmPassword, 
+            password,  
             roleIds, 
             medicalLicenseNumber, 
             specialityIds, 
@@ -213,7 +231,6 @@ export const usePersonalForm = (props: UsePersonalFormProps) => {
           const { 
             username, 
             password, 
-            confirmPassword, 
             roleIds, 
             position, 
             department, 
@@ -238,11 +255,11 @@ export const usePersonalForm = (props: UsePersonalFormProps) => {
         }
       } else {
         if (isDoctorEditData(formData)) {
-          const { id, ...updateData } = formData;
+          const { ...updateData } = formData;
           await (props as UseDoctorEditFormProps).onSubmit(updateData);
           
         } else if (isAdministrativeEditData(formData)) {
-          const { id, ...updateData } = formData;
+          const { ...updateData } = formData;
           await (props as UseAdministrativeEditFormProps).onSubmit(updateData);
         }
       }

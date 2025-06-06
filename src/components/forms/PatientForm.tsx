@@ -32,9 +32,9 @@ export const PatientForm: React.FC<PatientFormProps> = ({
     { value: 'O', label: 'Otro' }
   ];
 
-  const getFieldValue = (field: keyof PatientFormData): string => {
-    return (formData as any)[field] || '';
-  };
+  // const getFieldValue = (field: keyof PatientFormData): string => {
+  //   return (formData as any)[field] || '';
+  // };
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); onSubmit(); }} className="space-y-6">

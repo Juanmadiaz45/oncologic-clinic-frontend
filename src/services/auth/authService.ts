@@ -1,7 +1,21 @@
+// src/services/auth/authService.ts
 import { api, setAuthToken, clearAuthToken } from '@/services/api/client';
-import { API_ENDPOINTS } from '@/constants';
-import { LoginRequest, LoginResponse, AuthUser } from '@/types';
-import { ROUTES } from '@/constants';
+// import { API_ENDPOINTS } from '@/constants';
+
+interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+interface AuthResponse {
+  accessToken: string;
+}
+
+interface AuthUser {
+  id: string;
+  username: string;
+  roles: string[];
+}
 
 interface JWTPayload {
   sub: string;
@@ -33,77 +47,47 @@ const decodeJWT = (token: string): JWTPayload | null => {
 class AuthService {
   private currentUser: AuthUser | null = null;
 
-  constructor() {
-    this.initializeFromStoredToken();
-  }
-
   // Login user
-  async login(credentials: LoginRequest): Promise<LoginResponse> {
-    const response = await api.post<LoginResponse>(
-      API_ENDPOINTS.LOGIN,
-      credentials
-    );
+  async login(credentials: LoginRequest): Promise<{ accessToken: string }> {
+    try {
+      const response = await api.post<AuthResponse>('/auth/login', credentials);
 
-    this.storeToken(response.accessToken, true);
-    
-    // Set token in API client
-    setAuthToken(response.accessToken);
+      // Set token in API client
+      setAuthToken(response.accessToken);
 
-    if (response.user) {
-      this.setCurrentUser(response.user);
-    } else {
+      // Store token persistently
+      localStorage.setItem('auth_token', response.accessToken);
+
+      // Decode JWT to get user info
       const decodedToken = decodeJWT(response.accessToken);
+
       if (decodedToken) {
+        // Extract user info from token
         const rawRoles = decodedToken.roles || [];
+        
+        console.log('Raw roles from token:', rawRoles); // Para debug
+        
+        // Los roles vienen como ["ROLE_DOCTOR"] o ["ROLE_ADMIN"], etc.
+        // Los normalizamos quitando el prefijo ROLE_ para facilitar el manejo
         const normalizedRoles = rawRoles.map((role: string) =>
           role.startsWith('ROLE_') ? role.substring(5) : role
         );
 
+        console.log('Normalized roles:', normalizedRoles); // Para debug
+
         this.currentUser = {
           id: decodedToken.sub,
           username: decodedToken.username || decodedToken.sub,
-          roles: normalizedRoles,
+          roles: normalizedRoles, // Roles sin el prefijo ROLE_
         };
-      }
-    }
 
-    return response;
-  }
-
-  initializeFromStoredToken(): boolean {
-    try {
-      const storedToken = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
-
-      if (!storedToken) {
-        return false;
+        console.log('Current user set:', this.currentUser); // Para debug
       }
 
-      const decodedToken = decodeJWT(storedToken);
-      if (!decodedToken || decodedToken.exp * 1000 < Date.now()) {
-        console.log('Token expirado, limpiando...');
-        this.clearStoredToken();
-        return false;
-      }
-
-      setAuthToken(storedToken);
-
-      const rawRoles = decodedToken.roles || [];
-      const normalizedRoles = rawRoles.map((role: string) =>
-        role.startsWith('ROLE_') ? role.substring(5) : role
-      );
-
-      this.currentUser = {
-        id: decodedToken.sub,
-        username: decodedToken.username || decodedToken.sub,
-        roles: normalizedRoles,
-      };
-
-      console.log('Usuario restaurado desde token:', this.currentUser);
-      return true;
+      return response;
     } catch (error) {
-      console.error('Error inicializando desde token:', error);
-      this.clearStoredToken();
-      return false;
+      console.error('Login error:', error);
+      throw new Error('Credenciales inválidas');
     }
   }
 
@@ -111,8 +95,8 @@ class AuthService {
   logout(): void {
     clearAuthToken();
     this.currentUser = null;
-    this.clearStoredToken();
-    window.location.href = ROUTES.LOGIN;
+    localStorage.removeItem('auth_token');
+    window.location.href = '/login';
   }
 
   // Get current user
@@ -132,70 +116,145 @@ class AuthService {
 
   // Check if user has specific role
   hasRole(role: string): boolean {
-    return this.currentUser?.roles.includes(role) ?? false;
+    if (!this.currentUser) return false;
+    
+    // Normalizar el rol de entrada (quitar ROLE_ si lo tiene)
+    const normalizedRole = role.startsWith('ROLE_') ? role.substring(5) : role;
+    
+    console.log('Checking role:', normalizedRole, 'against user roles:', this.currentUser.roles); // Para debug
+    
+    return this.currentUser.roles.includes(normalizedRole);
   }
 
   // Check if user has any of the specified roles
   hasAnyRole(roles: string[]): boolean {
-    return roles.some(role => this.hasRole(role));
+    if (!this.currentUser) return false;
+    
+    // Normalizar todos los roles
+    const normalizedRoles = roles.map(role => 
+      role.startsWith('ROLE_') ? role.substring(5) : role
+    );
+    
+    console.log('Checking any of roles:', normalizedRoles, 'against user roles:', this.currentUser.roles); // Para debug
+    
+    return normalizedRoles.some(role => this.currentUser!.roles.includes(role));
   }
 
   // Check if user has all specified roles
   hasAllRoles(roles: string[]): boolean {
-    return roles.every(role => this.hasRole(role));
+    if (!this.currentUser) return false;
+    
+    // Normalizar todos los roles
+    const normalizedRoles = roles.map(role => 
+      role.startsWith('ROLE_') ? role.substring(5) : role
+    );
+    
+    return normalizedRoles.every(role => this.currentUser!.roles.includes(role));
   }
 
   // Role-specific checks
   isAdmin(): boolean {
-    return this.hasRole('ADMIN') || this.hasRole('ROLE_ADMIN');
+    return this.hasRole('ADMIN');
   }
 
   isDoctor(): boolean {
-    return this.hasRole('DOCTOR') || this.hasRole('ROLE_DOCTOR');
+    return this.hasRole('DOCTOR');
   }
 
   isAdministrative(): boolean {
-    return this.hasRole('ADMINISTRATIVE') || this.hasRole('ROLE_ADMINISTRATIVE');
+    return this.hasRole('ADMINISTRATIVE');
   }
 
   isPatient(): boolean {
-    return this.hasRole('PATIENT') || this.hasRole('ROLE_PATIENT');
+    return this.hasRole('PATIENT');
   }
 
-  // Store token persistently
-  storeToken(token: string, persistent: boolean = false): void {
-    if (persistent) {
-      localStorage.setItem('auth_token', token);
-      sessionStorage.removeItem('auth_token');
-    } else {
-      sessionStorage.setItem('auth_token', token);
-      localStorage.removeItem('auth_token');
+  // Initialize auth state from stored token
+  initializeFromStoredToken(): boolean {
+    try {
+      const storedToken = localStorage.getItem('auth_token');
+
+      if (!storedToken) return false;
+
+      // Check if the token has not expired
+      const decodedToken = decodeJWT(storedToken);
+      if (!decodedToken || decodedToken.exp * 1000 < Date.now()) {
+        this.logout();
+        return false;
+      }
+
+      // Restore state
+      setAuthToken(storedToken);
+
+      const rawRoles = decodedToken.roles || [];
+      const normalizedRoles = rawRoles.map((role: string) =>
+        role.startsWith('ROLE_') ? role.substring(5) : role
+      );
+
+      this.currentUser = {
+        id: decodedToken.sub,
+        username: decodedToken.username || decodedToken.sub,
+        roles: normalizedRoles,
+      };
+
+      console.log('Initialized user from token:', this.currentUser); // Para debug
+
+      return true;
+    } catch (error) {
+      console.error('Error initializing from token:', error);
+      this.logout();
+      return false;
     }
   }
 
-  // Clear stored token
-  clearStoredToken(): void {
-    localStorage.removeItem('auth_token');
-    sessionStorage.removeItem('auth_token');
+  // Get user permissions based on roles
+  getPermissions(): string[] {
+    if (!this.currentUser) return [];
+
+    const permissions: string[] = [];
+
+    if (this.isAdmin()) {
+      permissions.push(
+        'users:read', 'users:create', 'users:update', 'users:delete',
+        'patients:read', 'patients:create', 'patients:update', 'patients:delete',
+        'doctors:read', 'doctors:create', 'doctors:update', 'doctors:delete',
+        'appointments:read', 'appointments:create', 'appointments:update', 'appointments:delete',
+        'laboratory:read', 'laboratory:create', 'laboratory:update', 'laboratory:delete',
+        'administration:read', 'administration:create', 'administration:update', 'administration:delete'
+      );
+    }
+
+    if (this.isDoctor()) {
+      permissions.push(
+        'patients:read', 'patients:update',
+        'appointments:read', 'appointments:create', 'appointments:update',
+        'medical-history:read', 'medical-history:create', 'medical-history:update',
+        'treatments:read', 'treatments:create', 'treatments:update',
+        'laboratory:read', 'laboratory:create'
+      );
+    }
+
+    if (this.isAdministrative()) {
+      permissions.push(
+        'patients:read', 'patients:create', 'patients:update',
+        'appointments:read', 'appointments:create', 'appointments:update',
+        'doctors:read', 'laboratory:read'
+      );
+    }
+
+    if (this.isPatient()) {
+      permissions.push(
+        'own-data:read', 'own-appointments:read',
+        'own-medical-history:read', 'own-results:read'
+      );
+    }
+
+    return [...new Set(permissions)];
   }
 
-  // Get stored token
-  getStoredToken(): string | null {
-    return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
-  }
-
-  // Check if token is valid (not expired)
-  isTokenValid(): boolean {
-    const token = this.getStoredToken();
-    if (!token) return false;
-
-    const decodedToken = decodeJWT(token);
-    return decodedToken ? decodedToken.exp * 1000 > Date.now() : false;
-  }
-
-  // Force refresh authentication state
-  refreshAuthState(): boolean {
-    return this.initializeFromStoredToken();
+  // Check if user has specific permission
+  hasPermission(permission: string): boolean {
+    return this.getPermissions().includes(permission);
   }
 }
 

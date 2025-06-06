@@ -8,7 +8,11 @@ const AdministrativeDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   
-  if (!id || id === 'undefined' || isNaN(parseInt(id, 10))) {
+  const administrativeId = id && !isNaN(parseInt(id, 10)) ? parseInt(id, 10) : 0;
+  
+  const { administrative, loading, error } = useAdministrativeById(administrativeId);
+
+  if (!id || id === 'undefined' || administrativeId === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -21,9 +25,6 @@ const AdministrativeDetailPage: React.FC = () => {
       </div>
     );
   }
-
-  const administrativeId = parseInt(id, 10);
-  const { administrative, loading, error } = useAdministrativeById(administrativeId);
 
   const formatStatus = (status: string) => {
     return status === 'A' ? 'Activo' : 'Inactivo';

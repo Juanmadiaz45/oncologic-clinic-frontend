@@ -8,7 +8,7 @@ import {
   PersonalType,
   SpecialityResponseDTO
 } from '@/types/personal';
-import { StatusType } from '@/constants';
+// import { StatusType } from '@/constants';
 
 interface PersonalFormProps {
   formData: DoctorFormData | DoctorEditFormData | AdministrativeFormData | AdministrativeEditFormData;
@@ -42,15 +42,21 @@ export const PersonalForm: React.FC<PersonalFormProps> = ({
   const isAdministrativeForm = personalType === PersonalType.ADMINISTRATIVE;
 
   // Type guards para acceso seguro a propiedades
-  const isDoctorFormData = (data: any): data is DoctorFormData | DoctorEditFormData => {
+  const isDoctorFormData = (
+    data: PersonalFormProps['formData']
+  ): data is DoctorFormData | DoctorEditFormData => {
     return 'medicalLicenseNumber' in data && 'specialityIds' in data;
   };
 
-  const isAdministrativeFormData = (data: any): data is AdministrativeFormData | AdministrativeEditFormData => {
+  const isAdministrativeFormData = (
+    data: PersonalFormProps['formData']
+  ): data is AdministrativeFormData | AdministrativeEditFormData => {
     return 'position' in data && 'department' in data;
   };
 
-  const hasUserFields = (data: any): data is DoctorFormData | AdministrativeFormData => {
+  const hasUserFields = (
+    data: PersonalFormProps['formData']
+  ): data is DoctorFormData | AdministrativeFormData => {
     return 'username' in data && 'password' in data && 'confirmPassword' in data;
   };
 

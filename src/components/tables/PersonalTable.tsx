@@ -136,7 +136,9 @@ export const PersonalTable: React.FC<PersonalTableProps> = ({
           <select
             className="border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             value={filterType}
-            onChange={(e) => setFilterType(e.target.value as any)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              setFilterType(e.target.value as 'ALL' | 'DOCTOR' | 'ADMINISTRATIVE')
+            }
           >
             <option value="ALL">Todos</option>
             <option value="DOCTOR">Doctores</option>

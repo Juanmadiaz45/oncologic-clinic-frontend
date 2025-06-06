@@ -62,10 +62,10 @@ export const PatientTable: React.FC<PatientTableProps> = ({
     return genderMap[gender as keyof typeof genderMap] || gender;
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES');
-  };
+  // const formatDate = (dateString: string) => {
+  //   const date = new Date(dateString);
+  //   return date.toLocaleDateString('es-ES');
+  // };
 
   const calculateAge = (birthDate: string) => {
     const birth = new Date(birthDate);
