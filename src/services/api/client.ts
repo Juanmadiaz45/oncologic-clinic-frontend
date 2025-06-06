@@ -34,6 +34,7 @@ const PUBLIC_ENDPOINTS = [
 
 export const setAuthToken = (token: string | null) => {
   authToken = token;
+  console.log('Token configurado:', token ? 'Sí' : 'No');
 };
 
 export const getAuthToken = () => authToken;
@@ -75,6 +76,9 @@ apiClient.interceptors.request.use(
     // Only add token if it is NOT a public endpoint and we have a token
     if (authToken && !isPublicEndpoint(config.url || '')) {
       config.headers.Authorization = `Bearer ${authToken}`;
+      console.log('Request con Authorization header:', config.url);
+    } else {
+      console.log('Request SIN Authorization header:', config.url);
     }
 
     // Add request timestamp for debugging
@@ -109,6 +113,8 @@ apiClient.interceptors.response.use(
     // Handle common HTTP errors
     if (error.response) {
       const { status, data } = error.response;
+
+      console.error(`API Error ${status}:`, error.config?.url, data);
 
       switch (status) {
         case 401:
@@ -168,6 +174,7 @@ apiClient.interceptors.response.use(
       return Promise.reject(apiError);
     } else if (error.request) {
       // Network error
+      console.error('Network error:', error.message);
       const networkError: ApiError = {
         message: MESSAGES.ERROR.NETWORK,
         status: 0,
@@ -178,6 +185,7 @@ apiClient.interceptors.response.use(
       return Promise.reject(networkError);
     } else {
       // Something else happened
+      console.error('Unknown error:', error.message);
       const unknownError: ApiError = {
         message: error.message || 'Unknown error occurred',
         status: 0,

@@ -8,6 +8,22 @@ import {
 import { useEffect } from 'react';
 import { AppLoadingScreen } from '@/components/ui/AppLoadingScreen';
 import LoginPage from '@/pages/auth/LoginPage';
+import {
+  PatientListPage,
+  PatientCreatePage,
+  PatientEditPage,
+  PatientDetailPage,
+} from '@/pages/patients';
+import {
+  PersonalListPage,
+  DoctorCreatePage,
+  AdministrativeCreatePage,
+  DoctorEditPage,
+  AdministrativeEditPage,
+  DoctorDetailPage,
+  AdministrativeDetailPage,
+} from '@/pages/staff';
+import { ROUTES } from '@/constants';
 import DoctorDashboard from '@/pages/dashboard/DoctorDashboard';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AppointmentStep1 from '@/pages/appointments/create/AppointmentStep1';
@@ -34,6 +50,35 @@ function App() {
           {/* Public Routes */}
           <Route path={ROUTES.LOGIN} element={<LoginPage />} />
 
+          {/* Patient Routes */}
+          <Route path={ROUTES.PATIENTS} element={<PatientListPage />} />
+          <Route path={ROUTES.PATIENT_CREATE} element={<PatientCreatePage />} />
+          <Route path={ROUTES.PATIENT_EDIT} element={<PatientEditPage />} />
+          <Route path={ROUTES.PATIENT_DETAIL} element={<PatientDetailPage />} />
+
+          {/* Personal Routes */}
+          <Route path={ROUTES.PERSONAL} element={<PersonalListPage />} />
+          <Route path="/staff/personal" element={<PersonalListPage />} />
+
+          {/* Doctor Routes */}
+          <Route path={ROUTES.DOCTOR_CREATE} element={<DoctorCreatePage />} />
+          <Route path="/staff/doctors/:id/edit" element={<DoctorEditPage />} />
+          <Route path="/staff/doctors/:id" element={<DoctorDetailPage />} />
+
+          {/* Administrative Routes */}
+          <Route
+            path={ROUTES.ADMINISTRATIVE_CREATE}
+            element={<AdministrativeCreatePage />}
+          />
+          <Route
+            path="/staff/administrative/:id/edit"
+            element={<AdministrativeEditPage />}
+          />
+          <Route
+            path="/staff/administrative/:id"
+            element={<AdministrativeDetailPage />}
+          />
+
           {/* Protected Routes */}
           <Route
             path={ROUTES.DASHBOARD}
@@ -54,7 +99,17 @@ function App() {
             }
           />
 
-          {/* Default redirect */}
+          {/* Appointment Routes */}
+          <Route
+            path={ROUTES.APPOINTMENT_CREATE_STEP1}
+            element={
+              <ProtectedRoute roles={['ADMIN', 'DOCTOR', 'ADMINISTRATIVE']}>
+                <AppointmentStep1 />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Dashboard with navigation */}
           <Route
             path="/"
             element={

@@ -22,6 +22,8 @@ export const ROUTES = {
   APPOINTMENT_EDIT: '/appointments/:id/edit',
 
   // Staff
+  PERSONAL: '/staff/personal',
+  
   DOCTORS: '/staff/doctors',
   DOCTOR_DETAIL: '/staff/doctors/:id',
   DOCTOR_CREATE: '/staff/doctors/create',
