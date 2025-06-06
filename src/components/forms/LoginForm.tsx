@@ -1,18 +1,23 @@
+// src/components/forms/LoginForm.tsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Alert from '@/components/ui/Alert';
 import { useAuth } from '@/hooks/useAuth';
 import { LoginRequest } from '@/types';
+import { ROUTES } from '@/constants';
 
 const LoginForm: React.FC = () => {
+  const navigate = useNavigate();
+  const { login, isLoading, error, clearError, isAdmin, isDoctor } = useAuth();
+
   const [formData, setFormData] = useState<LoginRequest>({
     username: '',
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
-  const { login, isLoading, error, clearError } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -25,7 +30,17 @@ const LoginForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(formData);
+
+    const success = await login(formData);
+
+    if (success) {
+      // Navigate based on role after successful login
+      if (isAdmin || isDoctor) {
+        navigate(ROUTES.DASHBOARD);
+      } else {
+        navigate(ROUTES.HOME);
+      }
+    }
   };
 
   const togglePasswordVisibility = () => {

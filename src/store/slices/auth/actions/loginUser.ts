@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { api, setAuthToken } from '@/services/api/client';
-import { API_ENDPOINTS, MESSAGES, TOKEN_KEY, USER_KEY } from '@/constants';
+import { MESSAGES, TOKEN_KEY, USER_KEY } from '@/constants';
 import { LoginRequest, LoginResponse } from '@/types';
 import { AxiosError } from 'axios';
 
@@ -8,10 +8,7 @@ export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials: LoginRequest, { rejectWithValue }) => {
     try {
-      const response = await api.post<LoginResponse>(
-        API_ENDPOINTS.LOGIN,
-        credentials
-      );
+      const response = await api.login<LoginResponse>(credentials);
 
       // Set token in API client
       setAuthToken(response.accessToken);

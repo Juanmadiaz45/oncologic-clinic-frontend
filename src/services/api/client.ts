@@ -1,9 +1,16 @@
+// src/services/api/client.ts
 import axios, {
   AxiosResponse,
   AxiosError,
   InternalAxiosRequestConfig,
 } from 'axios';
-import { API_BASE_URL, MESSAGES } from '@/constants';
+import {
+  API_BASE_URL,
+  MESSAGES,
+  ROUTES,
+  TOKEN_KEY,
+  API_ENDPOINTS,
+} from '@/constants';
 import { ApiError } from '@/types';
 
 // Create axios instance
@@ -18,6 +25,13 @@ const apiClient = axios.create({
 // Token management
 let authToken: string | null = null;
 
+// Endpoints that DO NOT require authentication
+const PUBLIC_ENDPOINTS = [
+  API_ENDPOINTS.LOGIN,
+  API_ENDPOINTS.FORGOT_PASSWORD,
+  // Add other public endpoints here
+];
+
 export const setAuthToken = (token: string | null) => {
   authToken = token;
 };
@@ -28,11 +42,38 @@ export const clearAuthToken = () => {
   authToken = null;
 };
 
+// Initialize token from localStorage on app start
+const initializeToken = () => {
+  const storedToken = localStorage.getItem(TOKEN_KEY);
+  if (storedToken) {
+    setAuthToken(storedToken);
+  }
+};
+
+// Call initialization
+initializeToken();
+
+// Store para dispatch
+let reduxStore: {
+  dispatch: (action: { type: string; [key: string]: unknown }) => void;
+} | null = null;
+
+export const setReduxStore = (store: {
+  dispatch: (action: { type: string; [key: string]: unknown }) => void;
+}) => {
+  reduxStore = store;
+};
+
+// Helper to check if an endpoint is public
+const isPublicEndpoint = (url: string): boolean => {
+  return PUBLIC_ENDPOINTS.some(endpoint => url.includes(endpoint));
+};
+
 // Request interceptor
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Add auth token to requests
-    if (authToken) {
+    // Only add token if it is NOT a public endpoint and we have a token
+    if (authToken && !isPublicEndpoint(config.url || '')) {
       config.headers.Authorization = `Bearer ${authToken}`;
     }
 
@@ -56,7 +97,9 @@ apiClient.interceptors.response.use(
       const duration =
         endTime.getTime() - response.config.metadata.startTime.getTime();
       console.log(
-        `API Response: ${response.config.method?.toUpperCase()} ${response.config.url} - ${duration}ms`
+        `API Response: ${response.config.method?.toUpperCase()} ${
+          response.config.url
+        } - ${duration}ms`
       );
     }
 
@@ -69,10 +112,23 @@ apiClient.interceptors.response.use(
 
       switch (status) {
         case 401:
-          // Unauthorized - clear token and redirect to login
-          clearAuthToken();
-          if (window.location.pathname !== '/login') {
-            window.location.href = '/login';
+          // Solo limpiar auth si NO es un endpoint público
+          if (!isPublicEndpoint(error.config?.url || '')) {
+            console.warn('Token expired or invalid, logging out...');
+
+            // Clear auth state
+            clearAuthToken();
+            localStorage.removeItem(TOKEN_KEY);
+
+            // Dispatch logout action if Redux store is available
+            if (reduxStore) {
+              reduxStore.dispatch({ type: 'auth/logoutUser/fulfilled' });
+            }
+
+            // Redirect to login if not already there
+            if (window.location.pathname !== ROUTES.LOGIN) {
+              window.location.href = ROUTES.LOGIN;
+            }
           }
           break;
 
@@ -164,6 +220,18 @@ export const api = {
     return response.data;
   },
 
+  // Special method for login (without token)
+  login: async <T = unknown>(credentials: unknown): Promise<T> => {
+    // We force this request to NOT have a token
+    const response = await apiClient.post(API_ENDPOINTS.LOGIN, credentials, {
+      headers: {
+        // We override any Authorization header
+        Authorization: undefined,
+      },
+    });
+    return response.data;
+  },
+
   // File upload method
   uploadFile: async <T = unknown>(
     url: string,
@@ -177,12 +245,12 @@ export const api = {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      onUploadProgress: progressEvent_1 => {
-        if (onProgress && progressEvent_1.total) {
-          const progress_1 = Math.round(
-            (progressEvent_1.loaded * 100) / progressEvent_1.total
+      onUploadProgress: progressEvent => {
+        if (onProgress && progressEvent.total) {
+          const progress = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
           );
-          onProgress(progress_1);
+          onProgress(progress);
         }
       },
     });
