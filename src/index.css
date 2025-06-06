@@ -45,7 +45,7 @@ body {
   .shadow-outline {
     box-shadow: 0 0 0 3px rgba(47, 147, 205, 0.1);
   }
-  
+
   .text-balance {
     text-wrap: balance;
   }
@@ -239,11 +239,11 @@ body {
   .form-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .responsive-stack {
     flex-direction: column;
   }
-  
+
   .responsive-stack > * {
     width: 100%;
   }
@@ -295,17 +295,12 @@ body {
   margin: 1.5rem 0;
 }
 
-/* Smooth scrolling for the entire application */
-html {
-  scroll-behavior: smooth;
-}
-
 /* Print styles */
 @media print {
   .no-print {
     display: none !important;
   }
-  
+
   .print-break {
     page-break-before: always;
   }
@@ -313,29 +308,33 @@ html {
 
 /* Animation improvements */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideDown {
-  from { 
-    opacity: 0; 
-    transform: translateY(-10px); 
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 @keyframes slideUp {
-  from { 
-    opacity: 0; 
-    transform: translateY(10px); 
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -380,7 +379,7 @@ html {
   .no-print {
     display: none !important;
   }
-  
+
   body {
     @apply text-black bg-white;
   }

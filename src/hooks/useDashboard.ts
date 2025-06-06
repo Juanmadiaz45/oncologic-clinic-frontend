@@ -22,11 +22,6 @@ export const useDashboard = (): UseDashboardReturn => {
     try {
       setIsLoading(true);
       setError(null);
-
-      if (!authService.isAuthenticated()) {
-        throw new Error('Usuario no autenticado');
-      }
-
       const currentUser = authService.getCurrentUser();
       console.log('Current user in dashboard hook:', currentUser); // Para debug
 
@@ -63,14 +58,11 @@ export const useDashboard = (): UseDashboardReturn => {
   }, [loadDashboardData]);
 
   useEffect(() => {
-    const interval = setInterval(
-      () => {
-        if (!isLoading && authService.isAuthenticated()) {
-          refreshData();
-        }
-      },
-      5 * 60 * 1000
-    ); // 5 minutos
+    const interval = setInterval(() => {
+      if (!isLoading && authService.isAuthenticated()) {
+        refreshData();
+      }
+    }, 5 * 60 * 1000); // 5 minutos
 
     return () => clearInterval(interval);
   }, [refreshData, isLoading]);

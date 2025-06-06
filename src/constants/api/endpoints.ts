@@ -4,7 +4,7 @@ export const API_ENDPOINTS = {
   LOGIN: '/auth/login',
   LOGOUT: '/auth/logout',
   FORGOT_PASSWORD: '/auth/forgot-password',
-
+  VALIDATE_TOKEN: '/auth/validate-token',
   // Users
   USERS: '/users',
   USERS_PAGINATED: '/users/paginated',

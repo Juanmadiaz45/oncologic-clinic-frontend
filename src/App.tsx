@@ -82,9 +82,10 @@ function App() {
           <Route
             path={ROUTES.DASHBOARD}
             element={
-              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
-                <DoctorDashboard />
-              </ProtectedRoute>
+              <ProtectedRoute
+                children={<DoctorDashboard />}
+                roles={['ADMIN', 'DOCTOR']}
+              ></ProtectedRoute>
             }
           />
 
@@ -92,19 +93,10 @@ function App() {
           <Route
             path={ROUTES.APPOINTMENT_CREATE_STEP1}
             element={
-              <ProtectedRoute roles={['ADMIN', 'DOCTOR', 'ADMINISTRATIVE']}>
-                <AppointmentStep1 />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Appointment Routes */}
-          <Route
-            path={ROUTES.APPOINTMENT_CREATE_STEP1}
-            element={
-              <ProtectedRoute roles={['ADMIN', 'DOCTOR', 'ADMINISTRATIVE']}>
-                <AppointmentStep1 />
-              </ProtectedRoute>
+              <ProtectedRoute
+                children={<AppointmentStep1 />}
+                roles={['ADMIN', 'DOCTOR', 'ADMINISTRATIVE']}
+              ></ProtectedRoute>
             }
           />
 

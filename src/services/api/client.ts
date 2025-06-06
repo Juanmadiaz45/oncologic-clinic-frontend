@@ -24,17 +24,23 @@ const apiClient = axios.create({
 
 // Token management
 let authToken: string | null = null;
+let isValidatingToken = false;
+let failedQueue: Array<{
+  resolve: (value?: unknown) => void;
+  reject: (error?: unknown) => void;
+  config: InternalAxiosRequestConfig;
+}> = [];
 
 // Endpoints that DO NOT require authentication
 const PUBLIC_ENDPOINTS = [
   API_ENDPOINTS.LOGIN,
-  API_ENDPOINTS.FORGOT_PASSWORD,
+  API_ENDPOINTS.VALIDATE_TOKEN,
   // Add other public endpoints here
 ];
 
 export const setAuthToken = (token: string | null) => {
   authToken = token;
-  console.log('Token configurado:', token ? 'Sí' : 'No');
+  console.log('Token configured:', token ? 'Yes' : 'No');
 };
 
 export const getAuthToken = () => authToken;
@@ -70,15 +76,72 @@ const isPublicEndpoint = (url: string): boolean => {
   return PUBLIC_ENDPOINTS.some(endpoint => url.includes(endpoint));
 };
 
+// Process the queue of failed requests
+const processQueue = (error: unknown, retry: boolean = false) => {
+  failedQueue.forEach(({ resolve, reject, config }) => {
+    if (error) {
+      reject(error);
+    } else if (retry && authToken) {
+      // Retry the original request with updated token
+      config.headers.Authorization = `Bearer ${authToken}`;
+      resolve(apiClient(config));
+    } else {
+      reject(new Error('Token validation failed'));
+    }
+  });
+
+  failedQueue = [];
+};
+
+// Validate token with backend
+const validateTokenWithBackend = async (): Promise<boolean> => {
+  try {
+    const response = await apiClient.post(
+      API_ENDPOINTS.VALIDATE_TOKEN,
+      {},
+      {
+        headers: { Authorization: `Bearer ${authToken}` },
+      }
+    );
+
+    return response.data?.valid === true;
+  } catch (error) {
+    console.error('Token validation failed:', error);
+    return false;
+  }
+};
+
+// Handle token expiration
+const handleTokenExpired = () => {
+  console.warn('Token expired, logging out...');
+
+  // Clear auth state
+  clearAuthToken();
+  localStorage.removeItem(TOKEN_KEY);
+
+  // Process queue with error
+  processQueue(new Error('Token expired'));
+
+  // Dispatch logout action if Redux store is available
+  if (reduxStore) {
+    reduxStore.dispatch({ type: 'auth/logoutUser/fulfilled' });
+  }
+
+  // Redirect to login if not already there
+  if (window.location.pathname !== ROUTES.LOGIN) {
+    window.location.href = ROUTES.LOGIN;
+  }
+};
+
 // Request interceptor
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // Only add token if it is NOT a public endpoint and we have a token
     if (authToken && !isPublicEndpoint(config.url || '')) {
       config.headers.Authorization = `Bearer ${authToken}`;
-      console.log('Request con Authorization header:', config.url);
+      console.log('Request with Authorization header:', config.url);
     } else {
-      console.log('Request SIN Authorization header:', config.url);
+      console.log('Request WITHOUT Authorization header:', config.url);
     }
 
     // Add request timestamp for debugging
@@ -92,7 +155,7 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor
+// Response interceptor with reactive 403 handling
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
     // Log response time in development
@@ -109,55 +172,80 @@ apiClient.interceptors.response.use(
 
     return response;
   },
-  (error: AxiosError) => {
-    // Handle common HTTP errors
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
+
+    // Handle 403/401 only for protected endpoints
+    if (
+      (error.response?.status === 403 || error.response?.status === 401) &&
+      !isPublicEndpoint(originalRequest?.url || '') &&
+      !originalRequest._retry &&
+      authToken
+    ) {
+      console.warn(
+        `Received ${error.response.status} for protected endpoint:`,
+        originalRequest.url
+      );
+
+      // If already validating token, queue this request
+      if (isValidatingToken) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject, config: originalRequest });
+        });
+      }
+
+      originalRequest._retry = true;
+      isValidatingToken = true;
+
+      try {
+        console.log('Validating token with backend...');
+
+        // Validate token with backend
+        const isValid = await validateTokenWithBackend();
+
+        if (isValid) {
+          console.log('Token is valid, issue might be permissions');
+
+          // Token is valid but there's another issue (permissions, etc.)
+          isValidatingToken = false;
+          processQueue(error, false);
+          return Promise.reject(error);
+        } else {
+          console.warn('Token is invalid/expired');
+
+          // Token is invalid/expired, logout user
+          isValidatingToken = false;
+          handleTokenExpired();
+          return Promise.reject(new Error('Token expired'));
+        }
+      } catch (validationError) {
+        console.error('Error during token validation:', validationError);
+
+        // If validation fails, assume token is expired
+        isValidatingToken = false;
+        handleTokenExpired();
+        return Promise.reject(validationError);
+      }
+    }
+
+    // Handle other HTTP errors
     if (error.response) {
       const { status, data } = error.response;
 
       console.error(`API Error ${status}:`, error.config?.url, data);
 
       switch (status) {
-        case 401:
-          // Solo limpiar auth si NO es un endpoint público
-          if (!isPublicEndpoint(error.config?.url || '')) {
-            console.warn('Token expired or invalid, logging out...');
-
-            // Clear auth state
-            clearAuthToken();
-            localStorage.removeItem(TOKEN_KEY);
-
-            // Dispatch logout action if Redux store is available
-            if (reduxStore) {
-              reduxStore.dispatch({ type: 'auth/logoutUser/fulfilled' });
-            }
-
-            // Redirect to login if not already there
-            if (window.location.pathname !== ROUTES.LOGIN) {
-              window.location.href = ROUTES.LOGIN;
-            }
-          }
-          break;
-
-        case 403:
-          // Forbidden
-          console.error('Access forbidden:', data);
-          break;
-
         case 404:
-          // Not found
           console.error('Resource not found:', error.config?.url);
           break;
-
         case 422:
-          // Validation error
           console.error('Validation error:', data);
           break;
-
         case 500:
-          // Server error
           console.error('Internal server error:', data);
           break;
-
         default:
           console.error('API Error:', status, data);
       }
