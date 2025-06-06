@@ -14,7 +14,7 @@ export * from './patients';
 // export * from './patients/requests';
 
 export * from './personal';
-export * from './patients/requests';
+// export * from './patients/requests';
 
 // Appointments
 export * from './appointments/tasks';
