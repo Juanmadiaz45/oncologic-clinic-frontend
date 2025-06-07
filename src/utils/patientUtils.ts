@@ -11,6 +11,23 @@ export const calculateAge = (birthDate: string): number => {
   return age;
 };
 
+export const validateIdNumber = (idNumber: string): { isValid: boolean; error?: string } => {
+  if (!idNumber.trim()) {
+    return { isValid: false, error: 'El número de identificación es obligatorio' };
+  }
+
+  if (idNumber.trim().length < 6) {
+    return { isValid: false, error: 'El número de identificación debe tener al menos 6 caracteres' };
+  }
+
+  const idRegex = /^[0-9]+$/;
+  if (!idRegex.test(idNumber)) {
+    return { isValid: false, error: 'El número de identificación solo puede contener números' };
+  }
+
+  return { isValid: true };
+};
+
 export const formatGender = (gender: 'M' | 'F' | 'O'): string => {
   const genderMap = {
     'M': 'Masculino',

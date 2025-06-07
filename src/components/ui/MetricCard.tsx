@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface MetricCardProps {
-  value: number | string;
+  value: number | string | React.ReactNode;
   label: string;
   color?: 'clinic' | 'green' | 'yellow' | 'red' | 'purple';
   icon?: React.ReactNode;

@@ -12,6 +12,7 @@ export interface MedicalHistoryResponse extends BaseEntity {
 }
 
 export interface PatientResponse extends BaseEntity {
+  idNumber: string;
   userData: UserResponseDTO;
   name: string;
   birthDate: string;
@@ -23,6 +24,7 @@ export interface PatientResponse extends BaseEntity {
 }
 
 export interface CreatePatientRequest {
+  idNumber: string;
   userData: {
     username: string;
     password: string;
@@ -38,6 +40,7 @@ export interface CreatePatientRequest {
 }
 
 export interface UpdatePatientRequest {
+  idNumber?: string;
   name?: string;
   birthDate?: string;
   gender?: 'M' | 'F' | 'O';
@@ -47,6 +50,7 @@ export interface UpdatePatientRequest {
 }
 
 export interface BasePatientFormData {
+  idNumber: string;
   name: string;
   birthDate: string;
   gender: 'M' | 'F' | 'O';

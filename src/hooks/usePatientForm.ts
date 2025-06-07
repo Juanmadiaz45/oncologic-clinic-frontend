@@ -39,6 +39,7 @@ export const usePatientForm = (props: UsePatientFormProps) => {
   const getDefaultFormData = (): PatientFormData | PatientEditFormData => {
     if (isCreateMode(props)) {
       return {
+        idNumber: '',
         name: '',
         birthDate: '',
         gender: 'M' as const,
@@ -55,6 +56,7 @@ export const usePatientForm = (props: UsePatientFormProps) => {
     } else {
       return props.initialData || {
         id: 0,
+        idNumber: '',
         name: '',
         birthDate: '',
         gender: 'M' as const,
@@ -83,6 +85,7 @@ export const usePatientForm = (props: UsePatientFormProps) => {
     const newErrors: Record<string, string> = {};
 
     // Basic validations (fields that always exist)
+    if (!formData.idNumber?.trim()) newErrors.idNumber = 'El número de identificación es obligatorio';
     if (!formData.name?.trim()) newErrors.name = 'El nombre es obligatorio';
     if (!formData.birthDate) newErrors.birthDate = 'La fecha de nacimiento es obligatoria';
     if (!formData.address?.trim()) newErrors.address = 'La dirección es obligatoria';

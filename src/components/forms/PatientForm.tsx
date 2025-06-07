@@ -82,6 +82,17 @@ export const PatientForm: React.FC<PatientFormProps> = ({
       <Card title="Información Personal">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input
+            label="Número de Identificación"
+            name="idNumber"
+            type="text"
+            required
+            value={formData.idNumber || ''}
+            onChange={(e) => onFieldChange('idNumber', e.target.value)}
+            error={errors.idNumber}
+            placeholder="Número de cédula o identificación"
+          />
+          
+          <Input
             label="Nombre Completo"
             name="name"
             type="text"

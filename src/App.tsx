@@ -1,4 +1,3 @@
-// src/App.tsx
 import {
   BrowserRouter as Router,
   Routes,
@@ -24,13 +23,14 @@ import {
   AdministrativeDetailPage,
 } from '@/pages/staff';
 import DoctorDashboard from '@/pages/dashboard/DoctorDashboard';
+import AdminDashboard from '@/pages/dashboard/AdminDashboard';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AppointmentStep1 from '@/pages/appointments/create/AppointmentStep1';
 import { useAuth } from '@/hooks/useAuth';
 import { ROUTES } from '@/constants';
 
 function App() {
-  const { initialize, isInitialized, isLoading, isAuthenticated } = useAuth();
+  const { initialize, isInitialized, isLoading, isAuthenticated, isAdmin, isDoctor } = useAuth();
 
   // Initialize auth on app start
   useEffect(() => {
@@ -41,6 +41,18 @@ function App() {
   if (!isInitialized || isLoading) {
     return <AppLoadingScreen />;
   }
+
+  // Helper function to determine which dashboard to show
+  const getDashboardComponent = () => {
+    if (isAdmin) {
+      return <AdminDashboard />;
+    } else if (isDoctor) {
+      return <DoctorDashboard />;
+    } else {
+      // For other roles, redirect to appropriate page or show default
+      return <Navigate to={ROUTES.LOGIN} replace />;
+    }
+  };
 
   return (
     <Router>
@@ -82,10 +94,9 @@ function App() {
           <Route
             path={ROUTES.DASHBOARD}
             element={
-              <ProtectedRoute
-                children={<DoctorDashboard />}
-                roles={['ADMIN', 'DOCTOR']}
-              ></ProtectedRoute>
+              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
+                {getDashboardComponent()}
+              </ProtectedRoute>
             }
           />
 

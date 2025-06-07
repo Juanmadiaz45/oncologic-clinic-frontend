@@ -207,9 +207,12 @@ export const usePersonalForm = (props: UsePersonalFormProps) => {
             password,  
             roleIds, 
             medicalLicenseNumber, 
-            specialityIds, 
+            specialityIds,
+            dateOfHiring, 
             ...personalFields 
           } = formData;
+
+          const dateTimeOfHiring = dateOfHiring ? `${dateOfHiring}T00:00:00` : '';
           
           const submitData: DoctorDTO = {
             personalData: {
@@ -218,7 +221,8 @@ export const usePersonalForm = (props: UsePersonalFormProps) => {
                 password,
                 roleIds
               },
-              ...personalFields
+              ...personalFields,
+              dateOfHiring: dateTimeOfHiring
             },
             medicalLicenseNumber,
             specialityIds
@@ -233,9 +237,12 @@ export const usePersonalForm = (props: UsePersonalFormProps) => {
             password, 
             roleIds, 
             position, 
-            department, 
+            department,
+            dateOfHiring, 
             ...personalFields 
           } = formData;
+
+          const dateTimeOfHiring = dateOfHiring ? `${dateOfHiring}T00:00:00` : '';
           
           const submitData: AdministrativeDTO = {
             personalData: {
@@ -244,7 +251,8 @@ export const usePersonalForm = (props: UsePersonalFormProps) => {
                 password,
                 roleIds
               },
-              ...personalFields
+              ...personalFields,
+              dateOfHiring: dateTimeOfHiring
             },
             position,
             department
@@ -255,11 +263,19 @@ export const usePersonalForm = (props: UsePersonalFormProps) => {
         }
       } else {
         if (isDoctorEditData(formData)) {
-          const { ...updateData } = formData;
+          const { dateOfHiring, ...restData } = formData;
+          const updateData = {
+           ...restData,
+            ...(dateOfHiring && { dateOfHiring: `${dateOfHiring}T00:00:00` })
+          };
           await (props as UseDoctorEditFormProps).onSubmit(updateData);
           
         } else if (isAdministrativeEditData(formData)) {
-          const { ...updateData } = formData;
+          const { dateOfHiring, ...restData } = formData;
+          const updateData = {
+            ...restData,
+            ...(dateOfHiring && { dateOfHiring: `${dateOfHiring}T00:00:00` })
+          };
           await (props as UseAdministrativeEditFormProps).onSubmit(updateData);
         }
       }
