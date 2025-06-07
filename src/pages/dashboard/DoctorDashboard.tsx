@@ -27,24 +27,21 @@ const DoctorDashboard: React.FC = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <div className="bg-white border border-red-200 rounded-xl p-8 shadow-soft">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Error al cargar</h3>
-            <p className="text-red-600 mb-6">{error}</p>
-            <button
-              onClick={refreshData}
-              className="bg-clinic-600 text-white px-6 py-2 rounded-lg hover:bg-clinic-700 transition-colors duration-200"
-            >
-              Intentar de nuevo
-            </button>
-          </div>
+  const errorBanner = error && (
+    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+      <div className="flex items-center">
+        <div className="text-yellow-600 text-sm">
+          ⚠️ {error}
         </div>
+        <button
+          onClick={refreshData}
+          className="ml-auto text-yellow-700 hover:text-yellow-800 text-sm underline"
+        >
+          Reintentar
+        </button>
       </div>
-    );
-  }
+    </div>
+  );
 
   if (!dashboardData) return null;
 

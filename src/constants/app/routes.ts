@@ -4,6 +4,10 @@ export const ROUTES = {
   LOGIN: '/login',
   DASHBOARD: '/dashboard',
   
+  // Medical Appointments
+  MEDICAL_APPOINTMENT: '/medical-appointment/:appointmentId',
+  MEDICAL_APPOINTMENT_VIEW: (appointmentId: number) => `/medical-appointment/${appointmentId}`,
+  
   // Patients
   PATIENTS: '/patients',
   PATIENT_DETAIL: '/patients/:id',

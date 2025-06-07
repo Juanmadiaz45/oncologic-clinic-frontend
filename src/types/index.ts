@@ -13,8 +13,8 @@ export * from './auth/user';
 export * from './patients';
 export * from './patients/requests';
 
-// Appointments
-export * from './appointments/tasks';
+// Medical Appointments
+export * from './medical-appointment';
 
 // Dashboard
 export * from './dashboard';

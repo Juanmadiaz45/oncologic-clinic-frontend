@@ -22,19 +22,25 @@ export const useDashboard = (): UseDashboardReturn => {
       setError(null);
 
       if (!authService.isAuthenticated()) {
-        throw new Error('Usuario no autenticado');
+        authService.logout();
+        return;
       }
 
       const currentUser = authService.getCurrentUser();
-      console.log('Current user in dashboard hook:', currentUser); // Para debug
+      console.log('Current user in dashboard hook:', currentUser);
       
-      // CORREGIDO: Verificar roles sin el prefijo ROLE_
       if (!currentUser || !authService.hasAnyRole(['DOCTOR', 'ADMIN'])) {
-        throw new Error('Acceso denegado: se requiere rol de doctor o administrador');
+        setError('Acceso denegado: se requiere rol de doctor o administrador');
+        return;
       }
 
+      // El servicio ya maneja los errores internamente y devuelve datos por defecto
       const data = await dashboardService.getDashboardData();
       setDashboardData(data);
+      
+      // Solo mostrar error si hay problemas de autenticación
+      setError(null);
+      
     } catch (err) {
       let errorMessage = 'Error loading dashboard data';
       
@@ -42,13 +48,30 @@ export const useDashboard = (): UseDashboardReturn => {
         errorMessage = err.message;
       }
       
-      setError(errorMessage);
       console.error('Error loading dashboard:', err);
 
+      // Solo hacer logout si es error de autenticación
       if (errorMessage.includes('autenticado') || errorMessage.includes('Session expired')) {
         authService.logout();
         return;
       }
+
+      // Para otros errores, mostrar dashboard con datos vacíos
+      setDashboardData({
+        metrics: {
+          appointmentsToday: 0,
+          activePatients: 0,
+          currentDate: new Date().getDate().toString(),
+          currentDay: new Date().toLocaleDateString('es-ES', { weekday: 'long' })
+        },
+        todayAppointments: [],
+        pendingTasks: [],
+        nextAppointment: null
+      });
+      
+      // Mostrar error pero no bloquear el dashboard
+      setError('Algunos datos no pudieron cargarse correctamente');
+      
     } finally {
       setIsLoading(false);
     }

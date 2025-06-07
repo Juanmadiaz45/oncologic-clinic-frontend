@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ClockIcon, MapPinIcon, CalendarDaysIcon, PlayIcon } from '@heroicons/react/24/outline';
 import { NextAppointment as NextAppointmentType } from '@/types/dashboard';
 
@@ -7,9 +8,19 @@ interface NextAppointmentProps {
 }
 
 const NextAppointment: React.FC<NextAppointmentProps> = ({ nextAppointment }) => {
+  const navigate = useNavigate();
+
   const handleStartAppointment = () => {
-    console.log('Comenzar cita médica');
-    // Aquí irá la lógica para comenzar la cita
+    if (nextAppointment && nextAppointment.id) {
+      // Navegar a la página de cita médica con el ID
+      navigate(`/medical-appointment/${nextAppointment.id}`);
+    } else {
+      // Si no hay ID en el nextAppointment, mostrar mensaje de error o usar un ID por defecto
+      console.error('No se encontró el ID de la cita');
+      // Opcional: mostrar un toast de error o usar un ID de ejemplo para desarrollo
+      // navigate('/medical-appointment/1'); // Solo para desarrollo
+      alert('Error: No se puede iniciar la cita. ID de cita no encontrado.');
+    }
   };
 
   if (!nextAppointment) {

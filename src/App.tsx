@@ -8,6 +8,7 @@ import {
 import { useEffect } from 'react';
 import LoginPage from '@/pages/auth/LoginPage';
 import DoctorDashboard from '@/pages/dashboard/DoctorDashboard';
+import MedicalAppointment from '@/pages/appointments/MedicalAppointment';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import authService from '@/services/auth/authService';
 
@@ -31,6 +32,16 @@ function App() {
             element={
               <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
                 <DoctorDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Medical Appointment Route */}
+          <Route
+            path="/medical-appointment/:appointmentId"
+            element={
+              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
+                <MedicalAppointment />
               </ProtectedRoute>
             }
           />
