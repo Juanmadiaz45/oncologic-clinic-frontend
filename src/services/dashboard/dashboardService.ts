@@ -21,6 +21,7 @@ interface BackendAppointmentSummary {
 }
 
 interface BackendNextAppointment {
+  id: number;
   time: string;
   patientName: string;
   office: string;
@@ -30,30 +31,32 @@ interface BackendNextAppointment {
 class DashboardService {
   async getMetrics(): Promise<DashboardMetrics> {
     try {
-      // CORREGIDO: Agregar /api/ al inicio
       const response = await api.get<BackendDashboardMetrics>('/doctor-dashboard/metrics');
       
-      // Transformar la respuesta del backend al formato del frontend
       return {
-        appointmentsToday: response.appointmentsToday,
-        activePatients: response.activePatients,
-        pendingResults: response.pendingObservations, // Mapear a pendingResults
-        emergencies: 0, // No existe en el backend
-        currentDate: response.currentDate,
-        currentDay: response.currentDay
+        appointmentsToday: response.appointmentsToday || 0,
+        activePatients: response.activePatients || 0,
+        pendingResults: response.pendingObservations || 0,
+        currentDate: response.currentDate || new Date().getDate().toString(),
+        currentDay: response.currentDay || new Date().toLocaleDateString('es-ES', { weekday: 'long' })
       };
     } catch (error) {
-      console.error('Error fetching dashboard metrics:', error);
-      throw new Error('No se pudieron obtener las métricas del dashboard');
+      console.warn('Error fetching dashboard metrics, using defaults:', error);
+      // Devolver valores por defecto en lugar de lanzar error
+      return {
+        appointmentsToday: 0,
+        activePatients: 0,
+        pendingResults: 0,
+        currentDate: new Date().getDate().toString(),
+        currentDay: new Date().toLocaleDateString('es-ES', { weekday: 'long' })
+      };
     }
   }
 
   async getTodayAppointments(): Promise<AppointmentSummary[]> {
     try {
-      // CORREGIDO: Agregar /api/ al inicio
       const appointments = await api.get<BackendAppointmentSummary[]>('/doctor-dashboard/appointments/today');
       
-      // Transformar la respuesta del backend
       return appointments.map(appointment => ({
         id: appointment.id,
         time: appointment.time,
@@ -63,65 +66,89 @@ class DashboardService {
         office: appointment.office
       }));
     } catch (error) {
-      console.error('Error fetching today appointments:', error);
-      throw new Error('No se pudieron obtener las citas de hoy');
-    }
-  }
-
-  private mapAppointmentStatus(backendStatus: string): AppointmentSummary['status'] {
-    switch (backendStatus) {
-      case 'SCHEDULED':
-        return 'SCHEDULED';
-      case 'IN_PROGRESS':
-        return 'IN_PROGRESS';
-      case 'COMPLETED':
-        return 'COMPLETED';
-      case 'CANCELLED':
-        return 'CANCELLED';
-      default:
-        return 'SCHEDULED';
+      console.warn('Error fetching today appointments, returning empty array:', error);
+      // Devolver array vacío en lugar de lanzar error
+      return [];
     }
   }
 
   async getNextAppointment(): Promise<NextAppointment | null> {
     try {
-      // CORREGIDO: Agregar /api/ al inicio
       const nextAppointment = await api.get<BackendNextAppointment>('/doctor-dashboard/appointments/next');
       return nextAppointment;
     } catch (error: unknown) {
-      // Si no hay próxima cita, el backend devuelve 404, lo cual es normal
-      if (error instanceof Error) {
-        console.error('Error fetching next appointment:', error);
-        throw new Error('No se pudo obtener la próxima cita');
+      // Verificar si error es del tipo esperado (por ejemplo, de Axios)
+      if (typeof error === 'object' && error !== null && 'response' in error) {
+        const axiosError = error as { response?: { status?: number } };
+
+        if (axiosError.response?.status === 404 || axiosError.response?.status === 204) {
+          console.info('No next appointment found');
+          return null;
+        }
       }
-      throw error;
+
+      console.warn('Error fetching next appointment:', error);
+      return null;
     }
+
   }
 
   async getDashboardData(): Promise<DashboardData> {
     try {
-      const [metrics, todayAppointments, nextAppointment] = await Promise.all([
+      // Ejecutar todas las llamadas y manejar errores individualmente
+      const [metrics, todayAppointments, nextAppointment] = await Promise.allSettled([
         this.getMetrics(),
         this.getTodayAppointments(),
         this.getNextAppointment()
       ]);
 
       return {
-        metrics,
-        todayAppointments,
-        pendingTasks: [], // Eliminamos las tareas pendientes
-        nextAppointment
+        metrics: metrics.status === 'fulfilled' ? metrics.value : {
+          appointmentsToday: 0,
+          activePatients: 0,
+          pendingResults: 0,
+          currentDate: new Date().getDate().toString(),
+          currentDay: new Date().toLocaleDateString('es-ES', { weekday: 'long' })
+        },
+        todayAppointments: todayAppointments.status === 'fulfilled' ? todayAppointments.value : [],
+        nextAppointment: nextAppointment.status === 'fulfilled' ? nextAppointment.value : null
       };
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      throw error;
+      // Incluso si todo falla, devolver estructura básica
+      return {
+        metrics: {
+          appointmentsToday: 0,
+          activePatients: 0,
+          pendingResults: 0,
+          currentDate: new Date().getDate().toString(),
+          currentDay: new Date().toLocaleDateString('es-ES', { weekday: 'long' })
+        },
+        todayAppointments: [],
+        nextAppointment: null
+      };
     }
   }
 
-  // Método deprecado pero mantenido para compatibilidad
-  /*async updateTaskStatus(taskId: number, completed: boolean): Promise<void> {
-    console.warn('updateTaskStatus is deprecated - pending tasks were removed');
-  }*/
+  // Resto de métodos sin cambios...
+  private mapAppointmentStatus(backendStatus: string): AppointmentSummary['status'] {
+    switch (backendStatus) {
+      case 'SCHEDULED':
+      case 'PENDIENTE':
+        return 'SCHEDULED';
+      case 'IN_PROGRESS':
+      case 'EN_PROGRESO':
+        return 'IN_PROGRESS';
+      case 'COMPLETED':
+      case 'COMPLETADA':
+        return 'COMPLETED';
+      case 'CANCELLED':
+      case 'CANCELADA':
+        return 'CANCELLED';
+      default:
+        return 'SCHEDULED';
+    }
+  }
 
   async createQuickAppointment(appointmentData: unknown): Promise<void> {
     try {

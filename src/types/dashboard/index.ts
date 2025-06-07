@@ -3,8 +3,7 @@ import { BaseEntity } from '../core/api';
 export interface DashboardMetrics {
   appointmentsToday: number;
   activePatients: number;
-  pendingResults: number; // Corresponde a pendingObservations del backend
-  emergencies: number; // Se mantiene pero siempre será 0
+  pendingResults: number;
   currentDate: string;
   currentDay: string;
 }
@@ -27,6 +26,7 @@ export interface PendingTask extends BaseEntity {
 }
 
 export interface NextAppointment {
+  id: number; // Agregado para poder navegar a la cita médica
   time: string;
   patientName: string;
   office: string;
@@ -36,6 +36,6 @@ export interface NextAppointment {
 export interface DashboardData {
   metrics: DashboardMetrics;
   todayAppointments: AppointmentSummary[];
-  pendingTasks: PendingTask[]; // Array vacío por ahora
+  pendingTasks?: PendingTask[]; // Array vacío por ahora
   nextAppointment: NextAppointment | null;
 }

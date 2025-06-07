@@ -10,7 +10,7 @@ export const taskReducers = {
   ) => {
     state.formData.medicalTasks.push(action.payload);
     const totalTaskTime = state.formData.medicalTasks.reduce(
-      (sum, task) => sum + task.estimatedTime,
+      (sum, task) => sum + (task.estimatedTime || 0),
       0
     );
     state.formData.duration = totalTaskTime + Math.ceil(totalTaskTime * 0.15);
@@ -23,7 +23,7 @@ export const taskReducers = {
       task => task.id !== action.payload
     );
     const totalTaskTime = state.formData.medicalTasks.reduce(
-      (sum, task) => sum + task.estimatedTime,
+      (sum, task) => sum + (task.estimatedTime || 0),
       0
     );
     state.formData.duration = totalTaskTime + Math.ceil(totalTaskTime * 0.15);
