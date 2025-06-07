@@ -1,8 +1,8 @@
 import { api } from '@/services/api/client'; // Usar el cliente existente
 import { API_ENDPOINTS } from '@/constants';
 import {
-  MedicalAppointment,
-  MedicalTask,
+  Appointment,
+  AppointmentTask,
   Observation,
   Treatment,
   PrescribedMedicine,
@@ -20,8 +20,8 @@ import {
 
 class MedicalAppointmentService {
   // ===== CITA MÉDICA =====
-  async getAppointmentDetails(appointmentId: number): Promise<MedicalAppointment> {
-    return api.get<MedicalAppointment>(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/details`);
+  async getAppointmentDetails(appointmentId: number): Promise<Appointment> {
+    return api.get<Appointment>(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/details`);
   }
 
   async startAppointment(appointmentId: number): Promise<void> {
@@ -33,16 +33,16 @@ class MedicalAppointmentService {
   }
 
   // ===== TAREAS MÉDICAS =====
-  async getAppointmentTasks(appointmentId: number): Promise<MedicalTask[]> {
-    const tasks = await api.get<MedicalTask[]>(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/tasks`);
-    return tasks.map((task: MedicalTask) => ({
+  async getAppointmentTasks(appointmentId: number): Promise<AppointmentTask[]> {
+    const tasks = await api.get<AppointmentTask[]>(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/tasks`);
+    return tasks.map((task: AppointmentTask) => ({
       ...task,
       completed: task.status === 'COMPLETADA'
     }));
   }
 
-  async updateTaskStatus(taskId: number, data: { status: string }): Promise<MedicalTask> {
-    return api.put<MedicalTask>(`${API_ENDPOINTS.MEDICAL_TASKS}/${taskId}`, {
+  async updateTaskStatus(taskId: number, data: { status: string }): Promise<AppointmentTask> {
+    return api.put<AppointmentTask>(`${API_ENDPOINTS.MEDICAL_TASKS}/${taskId}`, {
       description: 'Tarea actualizada',
       estimatedTime: 30,
       status: data.status,

@@ -3,8 +3,8 @@ import { AxiosError } from 'axios';
 import { useAuth } from '@/hooks/useAuth';
 
 import {
-  MedicalAppointment,
-  MedicalTask,
+  Appointment,
+  AppointmentTask,
   Observation,
   Treatment,
   TypeOfTreatment,
@@ -15,8 +15,8 @@ import {
 import medicalAppointmentService from '@/services/medical-appointment/medicalAppointmentService';
 
 interface UseMedicalAppointmentReturn {
-  appointment: MedicalAppointment | null;
-  tasks: MedicalTask[];
+  appointment: Appointment | null;
+  tasks: AppointmentTask[];
   observations: Observation[];
   treatments: Treatment[];
   treatmentTypes: TypeOfTreatment[];
@@ -38,8 +38,8 @@ interface UseMedicalAppointmentReturn {
 }
 
 export const useMedicalAppointment = (appointmentId: number): UseMedicalAppointmentReturn => {
-  const [appointment, setAppointment] = useState<MedicalAppointment | null>(null);
-  const [tasks, setTasks] = useState<MedicalTask[]>([]);
+  const [appointment, setAppointment] = useState<Appointment | null>(null);
+  const [tasks, setTasks] = useState<AppointmentTask[]>([]);
   const [observations, setObservations] = useState<Observation[]>([]);
   const [treatments, setTreatments] = useState<Treatment[]>([]);
   const [treatmentTypes, setTreatmentTypes] = useState<TypeOfTreatment[]>([]);

@@ -1,9 +1,9 @@
 import React from 'react';
 import { CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
-import { MedicalTask } from '@/types/appointments/medicalAppointmentTypesPage';
+import { AppointmentTask } from '@/types/appointments/medicalAppointmentTypesPage';
 
 interface MedicalTasksProps {
-  tasks: MedicalTask[];
+  tasks: AppointmentTask[];
   onTaskToggle: (taskId: number, completed: boolean) => void;
   completedCount: number;
   totalCount: number;
