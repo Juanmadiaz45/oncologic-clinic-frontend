@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { api } from '@/services/api/client'; // Usar el cliente existente
 import { API_ENDPOINTS } from '@/constants';
 import {
   MedicalAppointment,
@@ -12,96 +12,65 @@ import {
   CreatePrescribedMedicineRequest
 } from '@/types/appointments/medicalAppointmentTypesPage';
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/g5/siscom',
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('auth_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('auth_token');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
-
 class MedicalAppointmentService {
   // ===== CITA MÉDICA =====
   async getAppointmentDetails(appointmentId: number): Promise<MedicalAppointment> {
-    const response = await api.get(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/details`);
-    return response.data;
+    return api.get<MedicalAppointment>(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/details`);
   }
 
   async startAppointment(appointmentId: number): Promise<void> {
-    await api.patch(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/start`);
+    return api.patch(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/start`);
   }
 
   async completeAppointment(appointmentId: number): Promise<void> {
-    await api.patch(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/complete`);
+    return api.patch(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/complete`);
   }
 
   // ===== TAREAS MÉDICAS =====
   async getAppointmentTasks(appointmentId: number): Promise<MedicalTask[]> {
-    const response = await api.get(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/tasks`);
-    return response.data.map((task: MedicalTask) => ({
+    const tasks = await api.get<MedicalTask[]>(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/tasks`);
+    return tasks.map((task: MedicalTask) => ({
       ...task,
       completed: task.status === 'COMPLETADA'
     }));
   }
 
   async updateTaskStatus(taskId: number, data: { status: string }): Promise<MedicalTask> {
-    const response = await api.put(`${API_ENDPOINTS.MEDICAL_TASKS}/${taskId}`, {
+    return api.put<MedicalTask>(`${API_ENDPOINTS.MEDICAL_TASKS}/${taskId}`, {
       description: 'Tarea actualizada',
       estimatedTime: 30,
       status: data.status,
       responsible: 'Doctor',
       medicalAppointmentIds: []
     });
-    return response.data;
   }
 
   // ===== OBSERVACIONES =====
   async getAppointmentObservations(appointmentId: number): Promise<Observation[]> {
-    const response = await api.get(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/observations`);
-    return response.data;
+    return api.get<Observation[]>(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/observations`);
   }
 
   async createObservation(data: CreateObservationRequest): Promise<Observation> {
-    const appointmentResultResponse = await api.get(
+    const appointmentResult = await api.get(
       `${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${data.medicalAppointmentId}/appointment-result`
     );
     
     const observationData = {
       content: data.content,
       recommendation: data.recommendation,
-      appointmentResultId: appointmentResultResponse.data.id
+      appointmentResultId: appointmentResult.id
     };
     
-    const response = await api.post(API_ENDPOINTS.OBSERVATIONS, observationData);
-    return response.data;
+    return api.post<Observation>(API_ENDPOINTS.OBSERVATIONS, observationData);
   }
 
   // ===== TRATAMIENTOS =====
   async getAppointmentTreatments(appointmentId: number): Promise<Treatment[]> {
-    const response = await api.get(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/treatments`);
-    return response.data;
+    return api.get<Treatment[]>(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/treatments`);
   }
 
   async createTreatment(data: CreateTreatmentRequest): Promise<Treatment> {
-    const appointmentResultResponse = await api.get(
+    const appointmentResult = await api.get(
       `${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${data.medicalAppointmentId}/appointment-result`
     );
     
@@ -111,22 +80,19 @@ class MedicalAppointmentService {
       description: data.description,
       dateStart: data.dateStart + 'T00:00:00', // Formato ISO completo
       endDate: data.endDate ? data.endDate + 'T23:59:59' : undefined,
-      appointmentResultId: appointmentResultResponse.data.id
+      appointmentResultId: appointmentResult.id
     };
     
-    const response = await api.post(API_ENDPOINTS.TREATMENTS, treatmentData);
-    return response.data;
+    return api.post<Treatment>(API_ENDPOINTS.TREATMENTS, treatmentData);
   }
 
   async getTreatmentTypes(): Promise<TypeOfTreatment[]> {
-    const response = await api.get(API_ENDPOINTS.TREATMENT_TYPES);
-    return response.data;
+    return api.get<TypeOfTreatment[]>(API_ENDPOINTS.TREATMENT_TYPES);
   }
 
   // ===== MEDICINAS PRESCRITAS =====
   async getTreatmentMedicines(treatmentId: number): Promise<PrescribedMedicine[]> {
-    const response = await api.get(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/1/treatments/${treatmentId}/medicines`);
-    return response.data;
+    return api.get<PrescribedMedicine[]>(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/1/treatments/${treatmentId}/medicines`);
   }
 
   async createPrescribedMedicine(data: CreatePrescribedMedicineRequest): Promise<PrescribedMedicine> {
@@ -140,8 +106,7 @@ class MedicalAppointmentService {
       treatmentId: data.treatmentId
     };
     
-    const response = await api.post(API_ENDPOINTS.PRESCRIBED_MEDICINES, medicineData);
-    return response.data;
+    return api.post<PrescribedMedicine>(API_ENDPOINTS.PRESCRIBED_MEDICINES, medicineData);
   }
 }
 

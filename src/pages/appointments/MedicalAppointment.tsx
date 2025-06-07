@@ -9,18 +9,19 @@ import {
   PlayIcon
 } from '@heroicons/react/24/outline';
 import { useMedicalAppointment } from '@/hooks/useMedicalAppointment';
-import authService from '@/services/auth/authService';
+import { useAuth } from '@/hooks/useAuth';
 import MedicalTasks from '@/components/medical-appointment/MedicalTasks';
 import Observations from '@/components/medical-appointment/Observations';
-import Treatments from '@/components/medical-appointment/Treatments';
 import Button from '@/components/ui/Button';
 import Alert from '@/components/ui/Alert';
+import Treatments from '@/components/medical-appointment/Treatments';
 
 const MedicalAppointment: React.FC = () => {
   const { appointmentId } = useParams<{ appointmentId: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'tasks' | 'observations' | 'treatments'>('tasks');
   const [showCompleteConfirm, setShowCompleteConfirm] = useState(false);
+  const { currentUser } = useAuth();
   
   const {
     appointment,
@@ -39,8 +40,6 @@ const MedicalAppointment: React.FC = () => {
     completedTasksCount,
     totalTasksCount
   } = useMedicalAppointment(parseInt(appointmentId || '0'));
-
-  const currentUser = authService.getCurrentUser();
 
   if (isLoading) {
     return (
@@ -288,7 +287,6 @@ const MedicalAppointment: React.FC = () => {
             onCreateObservation={createObservation}
           />
         )}
-
         {activeTab === 'treatments' && (
           <Treatments
             treatments={treatments}

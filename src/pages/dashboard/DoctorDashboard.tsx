@@ -10,11 +10,11 @@ import TodayAppointments from '@/components/dashboard/TodayAppointments';
 import NextAppointment from '@/components/dashboard/NextAppointment';
 import QuickActions from '@/components/dashboard/QuickActions';
 import { useDashboard } from '@/hooks/useDashboard';
-import authService from '@/services/auth/authService';
+import { useAuth } from '@/hooks/useAuth';
 
 const DoctorDashboard: React.FC = () => {
   const { dashboardData, isLoading, error, refreshData } = useDashboard();
-  const currentUser = authService.getCurrentUser();
+  const { currentUser } = useAuth();
 
   if (isLoading) {
     return (

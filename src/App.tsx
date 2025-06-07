@@ -101,16 +101,6 @@ function App() {
             }
           />
 
-          {/* Medical Appointment Route */}
-          <Route
-            path="/medical-appointment/:appointmentId"
-            element={
-              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
-                <MedicalAppointment />
-              </ProtectedRoute>
-            }
-          />
-
           {/* Default redirect */}
           {/* Appointment Routes */}
           <Route
@@ -120,6 +110,16 @@ function App() {
                 children={<AppointmentStep1 />}
                 roles={['ADMIN', 'DOCTOR', 'ADMINISTRATIVE']}
               ></ProtectedRoute>
+            }
+          />
+
+          {/* Medical Appointment Route */}
+          <Route
+            path="/medical-appointment/:appointmentId"
+            element={
+              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
+                <MedicalAppointment />
+              </ProtectedRoute>
             }
           />
 

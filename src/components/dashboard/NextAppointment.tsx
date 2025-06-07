@@ -20,7 +20,7 @@ const NextAppointment: React.FC<NextAppointmentProps> = ({ nextAppointment }) =>
       // Opcional: mostrar un toast de error o usar un ID de ejemplo para desarrollo
       // navigate('/medical-appointment/1'); // Solo para desarrollo
       alert('Error: No se puede iniciar la cita. ID de cita no encontrado.');
-    }
+    } 
   };
 
   if (!nextAppointment) {

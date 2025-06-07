@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { DashboardData } from '@/types/dashboard';
 import dashboardService from '@/services/dashboard/dashboardService';
-import authService from '@/services/auth/authService';
+import { useAuth } from '@/hooks/useAuth';
 
 interface UseDashboardReturn {
   dashboardData: DashboardData | null;
@@ -18,20 +18,21 @@ export const useDashboard = (): UseDashboardReturn => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { isAuthenticated, currentUser, hasAnyRole, logout } = useAuth();
+
   const loadDashboardData = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      if (!authService.isAuthenticated()) {
-        authService.logout();
+      if (!isAuthenticated) {
+        logout();
         return;
       }
 
-      const currentUser = authService.getCurrentUser();
       console.log('Current user in dashboard hook:', currentUser);
       
-      if (!currentUser || !authService.hasAnyRole(['DOCTOR', 'ADMIN'])) {
+      if (!currentUser || !hasAnyRole(['DOCTOR', 'ADMIN'])) {
         setError('Acceso denegado: se requiere rol de doctor o administrador');
         return;
       }
@@ -54,7 +55,7 @@ export const useDashboard = (): UseDashboardReturn => {
 
       // Solo hacer logout si es error de autenticación
       if (errorMessage.includes('autenticado') || errorMessage.includes('Session expired')) {
-        authService.logout();
+        logout();
         return;
       }
 
@@ -78,7 +79,7 @@ export const useDashboard = (): UseDashboardReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [isAuthenticated, currentUser, hasAnyRole, logout]);
 
   const refreshData = useCallback(async () => {
     await loadDashboardData();
@@ -90,13 +91,13 @@ export const useDashboard = (): UseDashboardReturn => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (!isLoading && authService.isAuthenticated()) {
+      if (!isLoading && isAuthenticated) {
         refreshData();
       }
     }, 5 * 60 * 1000); // 5 minutos
 
     return () => clearInterval(interval);
-  }, [refreshData, isLoading]);
+  }, [refreshData, isLoading, isAuthenticated]);
 
   return {
     dashboardData,

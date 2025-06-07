@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AxiosError } from 'axios';
+import { useAuth } from '@/hooks/useAuth';
 
 import {
   MedicalAppointment,
@@ -12,7 +13,6 @@ import {
   TaskStatus
 } from '@/types/appointments/medicalAppointmentTypesPage';
 import medicalAppointmentService from '@/services/medical-appointment/medicalAppointmentService';
-import authService from '@/services/auth/authService';
 
 interface UseMedicalAppointmentReturn {
   appointment: MedicalAppointment | null;
@@ -45,13 +45,14 @@ export const useMedicalAppointment = (appointmentId: number): UseMedicalAppointm
   const [treatmentTypes, setTreatmentTypes] = useState<TypeOfTreatment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { isAuthenticated, logout } = useAuth();
 
   const loadData = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      if (!authService.isAuthenticated()) {
+      if (!isAuthenticated) {
         throw new Error('Usuario no autenticado');
       }
 
@@ -82,13 +83,13 @@ export const useMedicalAppointment = (appointmentId: number): UseMedicalAppointm
       if (
         errorMessage.includes('autenticado') || (err as AxiosError)?.response?.status === 401
       ) {
-        authService.logout();
+        logout();
       } 
 
     } finally {
       setIsLoading(false);
     }
-  }, [appointmentId]);
+  }, [appointmentId, isAuthenticated, logout]);
 
   const startAppointment = useCallback(async () => {
     try {
