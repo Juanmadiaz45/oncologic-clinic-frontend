@@ -3,7 +3,7 @@ import { BaseEntity } from '../core/api';
 export type TaskStatus = 'PENDIENTE' | 'EN_PROGRESO' | 'COMPLETADA';
 
 // ===== BASIC TYPES =====
-export interface MedicalAppointment extends BaseEntity {
+export interface Appointment extends BaseEntity {
   doctorId: number;
   typeOfMedicalAppointmentId: number;
   appointmentDate: string;
@@ -17,7 +17,7 @@ export interface MedicalAppointment extends BaseEntity {
   status: string;
 }
 
-export interface MedicalTask extends BaseEntity {
+export interface AppointmentTask extends BaseEntity {
   description: string;
   estimatedTime?: number;
   status: TaskStatus;

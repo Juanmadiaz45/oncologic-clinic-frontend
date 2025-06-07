@@ -28,7 +28,7 @@ export const calculateDuration = createAsyncThunk(
 
     // Calculate total duration with 15% buffer
     const totalTaskTime = tasks.reduce(
-      (sum, task) => sum + task.estimatedTime,
+      (sum, task) => sum + (task.estimatedTime || 0),
       0
     );
     const bufferTime = Math.ceil(totalTaskTime * 0.15);
