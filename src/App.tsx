@@ -30,6 +30,7 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AppointmentStep1 from '@/pages/appointments/create/AppointmentStep1';
 import AppointmentStep2 from '@/pages/appointments/create/AppointmentStep2';
 import { useAuth } from '@/hooks/useAuth';
+import PatientMedicalHistoryPage from '@/pages/patients/PatientMedicalHistoryPage';
 import { ROUTES } from '@/constants';
 
 function App() {
@@ -78,6 +79,14 @@ function App() {
           <Route path={ROUTES.PATIENT_CREATE} element={<PatientCreatePage />} />
           <Route path={ROUTES.PATIENT_EDIT} element={<PatientEditPage />} />
           <Route path={ROUTES.PATIENT_DETAIL} element={<PatientDetailPage />} />
+          <Route 
+            path="/patients/:id/medical-history" 
+            element={
+              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
+                <PatientMedicalHistoryPage />
+              </ProtectedRoute>
+            } 
+          />
 
           {/* Personal Routes */}
           <Route path={ROUTES.PERSONAL} element={<PersonalListPage />} />

@@ -15,6 +15,7 @@ export const ROUTES = {
   PATIENT_DETAIL: '/patients/:id',
   PATIENT_CREATE: '/patients/create',
   PATIENT_EDIT: '/patients/:id/edit',
+  PATIENT_MEDICAL_HISTORY: '/patients/:id/medical-history',
 
   // Appointments
   APPOINTMENTS: '/appointments',

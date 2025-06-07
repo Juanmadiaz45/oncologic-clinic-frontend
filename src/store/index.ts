@@ -4,6 +4,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import appointmentReducer from './slices/appointment'; // Import from index.ts
 import authReducer from './slices/auth';
 import adminDashboardReducer from './slices/adminDashboard';
+import medicalHistoryReducer from './slices/medicalHistory';
 import { setReduxStore } from '@/services/api/client';
 
 export const store = configureStore({
@@ -11,6 +12,7 @@ export const store = configureStore({
     appointment: appointmentReducer, // Use the imported reducer
     auth: authReducer,
     adminDashboard: adminDashboardReducer,
+    medicalHistory: medicalHistoryReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

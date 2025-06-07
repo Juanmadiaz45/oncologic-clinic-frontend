@@ -304,16 +304,9 @@ const PatientDetailPage: React.FC = () => {
                 <Button
                   variant="secondary"
                   className="w-full justify-center"
-                  onClick={() => alert('Función próximamente disponible')}
+                  onClick={() => navigate(`/patients/${patient.id}/medical-history`)}
                 >
                   📋 Ver Historial
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="w-full justify-center"
-                  onClick={() => alert('Función próximamente disponible')}
-                >
-                  💊 Tratamientos
                 </Button>
               </div>
             </Card>
