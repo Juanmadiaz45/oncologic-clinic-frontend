@@ -1,6 +1,6 @@
 // API Endpoints
 export const API_ENDPOINTS = {
-  // Auth
+  
   LOGIN: '/auth/login',
   LOGOUT: '/auth/logout',
   FORGOT_PASSWORD: '/auth/forgot-password',
@@ -57,4 +57,7 @@ export const API_ENDPOINTS = {
   // Roles and Permissions
   ROLES: '/roles',
   PERMISSIONS: '/permissions',
+
+  // Dashboard
+  DOCTOR_DASHBOARD: '/doctor-dashboard',
 } as const;

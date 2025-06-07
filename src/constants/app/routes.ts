@@ -4,6 +4,11 @@ export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
   DASHBOARD: '/dashboard',
+  
+  // Medical Appointments
+  MEDICAL_APPOINTMENT: '/medical-appointment/:appointmentId',
+  MEDICAL_APPOINTMENT_VIEW: (appointmentId: number) => `/medical-appointment/${appointmentId}`,
+  
 
   // Patients
   PATIENTS: '/patients',

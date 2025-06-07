@@ -23,9 +23,11 @@ import {
   AdministrativeDetailPage,
 } from '@/pages/staff';
 import DoctorDashboard from '@/pages/dashboard/DoctorDashboard';
+import MedicalAppointment from '@/pages/appointments/MedicalAppointment';
 import AdminDashboard from '@/pages/dashboard/AdminDashboard';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AppointmentStep1 from '@/pages/appointments/create/AppointmentStep1';
+import AppointmentStep2 from '@/pages/appointments/create/AppointmentStep2';
 import { useAuth } from '@/hooks/useAuth';
 import { ROUTES } from '@/constants';
 
@@ -96,6 +98,10 @@ function App() {
             path="/staff/administrative/:id"
             element={<AdministrativeDetailPage />}
           />
+          <Route
+            path="/appointments/create/step2"
+            element={<AppointmentStep2 />}
+          />
 
           {/* Protected Routes */}
           <Route
@@ -107,6 +113,7 @@ function App() {
             }
           />
 
+          {/* Default redirect */}
           {/* Appointment Routes */}
           <Route
             path={ROUTES.APPOINTMENT_CREATE_STEP1}
@@ -115,6 +122,16 @@ function App() {
                 children={<AppointmentStep1 />}
                 roles={['ADMIN', 'DOCTOR', 'ADMINISTRATIVE']}
               ></ProtectedRoute>
+            }
+          />
+
+          {/* Medical Appointment Route */}
+          <Route
+            path="/medical-appointment/:appointmentId"
+            element={
+              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
+                <MedicalAppointment />
+              </ProtectedRoute>
             }
           />
 

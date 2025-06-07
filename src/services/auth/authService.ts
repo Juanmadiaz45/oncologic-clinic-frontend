@@ -57,6 +57,18 @@ class AuthService {
     localStorage.removeItem('auth_token');
     sessionStorage.removeItem('auth_token');
   }
+
+  initializeFromStoredToken(): boolean {
+    try {
+      const storedToken = localStorage.getItem('auth_token');
+      if (!storedToken) return false;
+
+      return true;
+    } catch (error) {
+      console.error('Error initializing from token:', error);
+      return false;
+    }
+  }
 }
 const authService = new AuthService();
 export default authService;
