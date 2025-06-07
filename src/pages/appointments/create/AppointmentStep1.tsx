@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { CalendarDaysIcon } from '@heroicons/react/24/outline';
-import Button from '@/components/ui/Button';
-import Alert from '@/components/ui/Alert';
-import UserDropdown from '@/components/ui/UserDropdown';
+import { AppointmentHeader } from '@/components/appointments/AppointmentHeader';
+import { CardContainer } from '@/components/ui/CardContainer';
+import { useAppointmentSteps } from '@/hooks/useAppointmentSteps';
+import { useAppointments } from '@/hooks/useAppointments';
 import {
   PatientSearchInput,
   AppointmentTypeSelector,
   DurationDisplay,
   TasksList,
 } from '@/components/appointments';
-import { useAppointments } from '@/hooks/useAppointments';
-import { ROUTES } from '@/constants';
+import Alert from '@/components/ui/Alert';
+import Button from '@/components/ui/Button';
 import { Patient } from '@/types';
 
 const AppointmentStep1: React.FC = () => {
-  const navigate = useNavigate();
   const {
     formData,
     searchResults,
@@ -34,15 +32,15 @@ const AppointmentStep1: React.FC = () => {
   } = useAppointments();
 
   const [searchTerm, setSearchTerm] = useState('');
+  const isFormValid = !!(formData.patient && formData.appointmentTypeId);
+  const { nextStep } = useAppointmentSteps(1, isFormValid);
 
-  // Load appointment types on component mount
   useEffect(() => {
     loadAppointmentTypes();
   }, [loadAppointmentTypes]);
 
-  // Calculate duration when type is selected
   useEffect(() => {
-    if (formData.appointmentTypeId && formData.appointmentTypeId !== null) {
+    if (formData.appointmentTypeId) {
       calculateDuration(formData.appointmentTypeId);
     }
   }, [formData.appointmentTypeId, calculateDuration]);
@@ -62,40 +60,17 @@ const AppointmentStep1: React.FC = () => {
     clearSearchResults();
   };
 
-  const handleTypeChange = (typeId: number) => {
-    selectAppointmentType(typeId);
-  };
-
-  const handleNext = () => {
-    if (!isFormValid) return;
-    navigate(ROUTES.APPOINTMENT_CREATE_STEP2);
-  };
-
-  const isFormValid = formData.patient && formData.appointmentTypeId;
-
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-4">
-            <div className="flex items-center space-x-4">
-              <CalendarDaysIcon className="h-6 w-6 text-clinic-600" />
-              <h1 className="text-xl font-semibold text-gray-900">
-                Agendar Cita Médica
-              </h1>
-              <span className="text-sm text-gray-500">
-                Paso 1 de 2: Seleccionar paciente
-              </span>
-            </div>
-            <UserDropdown />
-          </div>
-        </div>
-      </header>
+      <AppointmentHeader
+        title="Agendar Cita Médica"
+        step="Seleccionar paciente"
+        currentStep={1}
+        totalSteps={2}
+      />
 
-      {/* Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-xl shadow-card border border-gray-200 p-8">
+        <CardContainer>
           {error && (
             <div className="mb-6">
               <Alert
@@ -107,7 +82,6 @@ const AppointmentStep1: React.FC = () => {
           )}
 
           <div className="space-y-6">
-            {/* Patient Search */}
             <PatientSearchInput
               searchTerm={searchTerm}
               searchResults={searchResults}
@@ -117,15 +91,13 @@ const AppointmentStep1: React.FC = () => {
               onPatientSelect={handlePatientSelect}
             />
 
-            {/* Appointment Type Selection */}
             <AppointmentTypeSelector
               appointmentTypes={appointmentTypes}
               selectedTypeId={formData.appointmentTypeId}
               isLoading={isLoadingTypes}
-              onChange={handleTypeChange}
+              onChange={selectAppointmentType}
             />
 
-            {/* Duration Display */}
             {formData.duration > 0 && (
               <DurationDisplay
                 duration={formData.duration}
@@ -133,17 +105,15 @@ const AppointmentStep1: React.FC = () => {
               />
             )}
 
-            {/* Medical Tasks List */}
             <TasksList
               tasks={formData.medicalTasks}
               selectedTypeId={formData.appointmentTypeId}
               totalDuration={formData.duration}
             />
 
-            {/* Navigation */}
             <div className="flex justify-end pt-4">
               <Button
-                onClick={handleNext}
+                onClick={nextStep}
                 disabled={!isFormValid}
                 size="lg"
                 className="min-w-[120px]"
@@ -152,7 +122,7 @@ const AppointmentStep1: React.FC = () => {
               </Button>
             </div>
           </div>
-        </div>
+        </CardContainer>
       </main>
     </div>
   );
