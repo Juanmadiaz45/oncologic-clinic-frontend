@@ -24,10 +24,6 @@ const TreatmentCard: React.FC<TreatmentCardProps> = ({ treatment }) => {
     frequencyOfAdministration: ''
   });
 
-  useEffect(() => {
-    loadMedicines();
-  }, [treatment.id]);
-
   const loadMedicines = async () => {
     try {
       setIsLoading(true);
@@ -39,6 +35,10 @@ const TreatmentCard: React.FC<TreatmentCardProps> = ({ treatment }) => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadMedicines();
+  }, [treatment.id]);
 
   const handleSubmitMedicine = async (e: React.FormEvent) => {
     e.preventDefault();

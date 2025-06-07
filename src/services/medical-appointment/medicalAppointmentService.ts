@@ -9,8 +9,7 @@ import {
   TypeOfTreatment,
   CreateObservationRequest,
   CreateTreatmentRequest,
-  CreatePrescribedMedicineRequest,
-  UpdateTaskStatusRequest
+  CreatePrescribedMedicineRequest
 } from '@/types/medical-appointment';
 
 const api = axios.create({
@@ -57,7 +56,7 @@ class MedicalAppointmentService {
   // ===== TAREAS MÉDICAS =====
   async getAppointmentTasks(appointmentId: number): Promise<MedicalTask[]> {
     const response = await api.get(`${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${appointmentId}/tasks`);
-    return response.data.map((task: any) => ({
+    return response.data.map((task: MedicalTask) => ({
       ...task,
       completed: task.status === 'COMPLETADA'
     }));

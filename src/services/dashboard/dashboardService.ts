@@ -77,17 +77,21 @@ class DashboardService {
     try {
       const nextAppointment = await api.get<BackendNextAppointment>('/doctor-dashboard/appointments/next');
       return nextAppointment;
-    } catch (error: any) {
-      // Si es 404 o 204, es normal (no hay próxima cita)
-      if (error?.response?.status === 404 || error?.response?.status === 204) {
-        console.info('No next appointment found');
-        return null;
+    } catch (error: unknown) {
+      // Verificar si error es del tipo esperado (por ejemplo, de Axios)
+      if (typeof error === 'object' && error !== null && 'response' in error) {
+        const axiosError = error as { response?: { status?: number } };
+
+        if (axiosError.response?.status === 404 || axiosError.response?.status === 204) {
+          console.info('No next appointment found');
+          return null;
+        }
       }
-      
+
       console.warn('Error fetching next appointment:', error);
-      // Para otros errores, también devolver null
       return null;
     }
+
   }
 
   async getDashboardData(): Promise<DashboardData> {

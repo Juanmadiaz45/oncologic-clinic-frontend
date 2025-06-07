@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { AxiosError } from 'axios';
+
 import {
   MedicalAppointment,
   MedicalTask,
@@ -6,7 +8,8 @@ import {
   Treatment,
   TypeOfTreatment,
   CreateObservationRequest,
-  CreateTreatmentRequest
+  CreateTreatmentRequest,
+  TaskStatus
 } from '@/types/medical-appointment';
 import medicalAppointmentService from '@/services/medical-appointment/medicalAppointmentService';
 import authService from '@/services/auth/authService';
@@ -76,9 +79,12 @@ export const useMedicalAppointment = (appointmentId: number): UseMedicalAppointm
       setError(errorMessage);
       console.error('Error loading appointment data:', err);
       
-      if (errorMessage.includes('autenticado') || (err as any)?.status === 401) {
+      if (
+        errorMessage.includes('autenticado') || (err as AxiosError)?.response?.status === 401
+      ) {
         authService.logout();
-      }
+      } 
+
     } finally {
       setIsLoading(false);
     }
@@ -109,9 +115,11 @@ export const useMedicalAppointment = (appointmentId: number): UseMedicalAppointm
       const status = completed ? 'COMPLETADA' : 'PENDIENTE';
       await medicalAppointmentService.updateTaskStatus(taskId, { status });
       
-      setTasks(prevTasks => 
-        prevTasks.map(task => 
-          task.id === taskId ? { ...task, status: status as any, completed } : task
+      setTasks(prevTasks =>
+        prevTasks.map(task =>
+      task.id === taskId
+        ? { ...task, status: status as TaskStatus, completed }
+        : task
         )
       );
     } catch (err) {

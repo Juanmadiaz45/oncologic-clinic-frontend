@@ -18,7 +18,6 @@ interface TreatmentsProps {
 
 const Treatments: React.FC<TreatmentsProps> = ({
   treatments,
-  treatmentTypes,
   appointmentId,
   patientId,
   onCreateTreatment
