@@ -21,6 +21,7 @@ interface BackendAppointmentSummary {
 }
 
 interface BackendNextAppointment {
+  id: number;
   time: string;
   patientName: string;
   office: string;
@@ -36,7 +37,6 @@ class DashboardService {
         appointmentsToday: response.appointmentsToday || 0,
         activePatients: response.activePatients || 0,
         pendingResults: response.pendingObservations || 0,
-        emergencies: 0,
         currentDate: response.currentDate || new Date().getDate().toString(),
         currentDay: response.currentDay || new Date().toLocaleDateString('es-ES', { weekday: 'long' })
       };
@@ -47,7 +47,6 @@ class DashboardService {
         appointmentsToday: 0,
         activePatients: 0,
         pendingResults: 0,
-        emergencies: 0,
         currentDate: new Date().getDate().toString(),
         currentDay: new Date().toLocaleDateString('es-ES', { weekday: 'long' })
       };
@@ -108,7 +107,6 @@ class DashboardService {
           appointmentsToday: 0,
           activePatients: 0,
           pendingResults: 0,
-          emergencies: 0,
           currentDate: new Date().getDate().toString(),
           currentDay: new Date().toLocaleDateString('es-ES', { weekday: 'long' })
         },
@@ -123,7 +121,6 @@ class DashboardService {
           appointmentsToday: 0,
           activePatients: 0,
           pendingResults: 0,
-          emergencies: 0,
           currentDate: new Date().getDate().toString(),
           currentDay: new Date().toLocaleDateString('es-ES', { weekday: 'long' })
         },

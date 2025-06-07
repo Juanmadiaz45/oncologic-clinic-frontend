@@ -3,8 +3,7 @@ import { BaseEntity } from '../core/api';
 export interface DashboardMetrics {
   appointmentsToday: number;
   activePatients: number;
-  //pendingResults: number; // Corresponde a pendingObservations del backend
-  //emergencies: number; // Se mantiene pero siempre será 0
+  pendingResults: number;
   currentDate: string;
   currentDay: string;
 }

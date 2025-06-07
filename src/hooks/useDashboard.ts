@@ -61,6 +61,7 @@ export const useDashboard = (): UseDashboardReturn => {
         metrics: {
           appointmentsToday: 0,
           activePatients: 0,
+          pendingResults: 0,
           currentDate: new Date().getDate().toString(),
           currentDay: new Date().toLocaleDateString('es-ES', { weekday: 'long' })
         },
