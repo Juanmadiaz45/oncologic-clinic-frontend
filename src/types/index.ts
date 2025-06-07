@@ -6,15 +6,16 @@ export * from './core/ui';
 
 // Auth
 export * from './auth';
-export * from './auth/requests';
-export * from './auth/user';
 
 // Patients
 export * from './patients';
-export * from './patients/requests';
+// export * from './patients/requests';
 
-// Medical Appointments
-export * from './medical-appointment';
+export * from './personal';
+// export * from './patients/requests';
+
+// Appointments
+export * from './appointments';
 
 // Dashboard
 export * from './dashboard';

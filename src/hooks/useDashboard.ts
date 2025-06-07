@@ -12,7 +12,9 @@ interface UseDashboardReturn {
 }
 
 export const useDashboard = (): UseDashboardReturn => {
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,7 +45,7 @@ export const useDashboard = (): UseDashboardReturn => {
       
     } catch (err) {
       let errorMessage = 'Error loading dashboard data';
-      
+
       if (err instanceof Error) {
         errorMessage = err.message;
       }
@@ -100,6 +102,6 @@ export const useDashboard = (): UseDashboardReturn => {
     dashboardData,
     isLoading,
     error,
-    refreshData
+    refreshData,
   };
 };

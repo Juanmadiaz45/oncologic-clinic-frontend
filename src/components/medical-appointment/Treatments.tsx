@@ -4,7 +4,7 @@ import {
   Treatment, 
   TypeOfTreatment, 
   CreateTreatmentRequest 
-} from '@/types/medical-appointment';
+} from '@/types/appointments/medicalAppointmentTypesPage';
 import Button from '@/components/ui/Button';
 import TreatmentCard from './TreatmentCard';
 

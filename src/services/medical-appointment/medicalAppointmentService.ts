@@ -10,7 +10,7 @@ import {
   CreateObservationRequest,
   CreateTreatmentRequest,
   CreatePrescribedMedicineRequest
-} from '@/types/medical-appointment';
+} from '@/types/appointments/medicalAppointmentTypesPage';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/g5/siscom',

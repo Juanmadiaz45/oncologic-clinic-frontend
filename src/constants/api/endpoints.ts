@@ -1,61 +1,63 @@
 // API Endpoints
 export const API_ENDPOINTS = {
-  // Auth
-  LOGIN: '/api/auth/login',
   
+  LOGIN: '/auth/login',
+  LOGOUT: '/auth/logout',
+  FORGOT_PASSWORD: '/auth/forgot-password',
+  VALIDATE_TOKEN: '/auth/validate-token',
   // Users
-  USERS: '/api/users',
-  USERS_PAGINATED: '/api/users/paginated',
-  USERS_SEARCH: '/api/users/search',
-  
+  USERS: '/users',
+  USERS_PAGINATED: '/users/paginated',
+  USERS_SEARCH: '/users/search',
+
   // Patients
-  PATIENTS: '/api/users/patients',
-  
+  PATIENTS: '/users/patients',
+
   // Doctors
-  DOCTORS: '/api/doctors',
-  
+  DOCTORS: '/doctors',
+
   // Administrative
-  ADMINISTRATIVE: '/api/administrative',
-  
+  ADMINISTRATIVE: '/administrative',
+
   // Specialities
-  SPECIALITIES: '/api/specialities',
-  
-  // Medical Appointments
-  MEDICAL_APPOINTMENTS: '/api/medical-appointments',
-  APPOINTMENT_TYPES: '/api/medical-appointment-types',
-  MEDICAL_OFFICES: '/api/medical-offices',
-  MEDICAL_TASKS: '/api/medical-tasks',
-  
+  SPECIALITIES: '/specialities',
+
+  // Appointments
+  MEDICAL_APPOINTMENTS: '/medical-appointments',
+  APPOINTMENT_TYPES: '/medical-appointment-types',
+  MEDICAL_OFFICES: '/medical-offices',
+  MEDICAL_TASKS: '/medical-tasks',
+
   // Medical History
-  MEDICAL_HISTORY: '/api/patients/medical-history',
-  
+  MEDICAL_HISTORY: '/patients/medical-history',
+
   // Observations
-  OBSERVATIONS: '/api/observations',
-  
+  OBSERVATIONS: '/observations',
+
   // Treatments
-  TREATMENTS: '/api/treatments',
-  TREATMENT_TYPES: '/api/type-of-treatments',
-  
+  TREATMENTS: '/treatments',
+  TREATMENT_TYPES: '/type-of-treatments',
+
   // Prescribed Medicines
-  PRESCRIBED_MEDICINES: '/api/prescribed-medicines',
-  
+  PRESCRIBED_MEDICINES: '/prescribed-medicines',
+
   // Appointment Results
-  APPOINTMENT_RESULTS: '/api/appointment-results',
-  
+  APPOINTMENT_RESULTS: '/appointment-results',
+
   // Laboratory
-  LABORATORIES: '/api/laboratories',
-  MEDICAL_EXAMINATIONS: '/api/medical-examinations',
-  EXAMINATION_RESULTS: '/api/examination-results',
-  EXAM_TYPES: '/api/types-of-exam',
-  
+  LABORATORIES: '/laboratories',
+  MEDICAL_EXAMINATIONS: '/medical-examinations',
+  EXAMINATION_RESULTS: '/examination-results',
+  EXAM_TYPES: '/types-of-exam',
+
   // Availability
-  AVAILABILITIES: '/api/availabilities',
-  STATUSES: '/api/statuses',
-  
+  AVAILABILITIES: '/availabilities',
+  STATUSES: '/statuses',
+
   // Roles and Permissions
-  ROLES: '/api/roles',
-  PERMISSIONS: '/api/permissions',
-  
+  ROLES: '/roles',
+  PERMISSIONS: '/permissions',
+
   // Dashboard
-  DOCTOR_DASHBOARD: '/api/doctor-dashboard'
+  DOCTOR_DASHBOARD: '/doctor-dashboard',
 } as const;

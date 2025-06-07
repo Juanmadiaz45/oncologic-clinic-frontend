@@ -10,7 +10,7 @@ import {
   CreateObservationRequest,
   CreateTreatmentRequest,
   TaskStatus
-} from '@/types/medical-appointment';
+} from '@/types/appointments/medicalAppointmentTypesPage';
 import medicalAppointmentService from '@/services/medical-appointment/medicalAppointmentService';
 import authService from '@/services/auth/authService';
 

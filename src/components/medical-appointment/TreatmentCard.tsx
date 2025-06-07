@@ -4,7 +4,7 @@ import {
   Treatment, 
   PrescribedMedicine, 
   CreatePrescribedMedicineRequest 
-} from '@/types/medical-appointment';
+} from '@/types/appointments/medicalAppointmentTypesPage';
 import medicalAppointmentService from '@/services/medical-appointment/medicalAppointmentService';
 import Button from '@/components/ui/Button';
 

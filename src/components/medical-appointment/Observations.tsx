@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PlusIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
-import { Observation, CreateObservationRequest } from '@/types/medical-appointment';
+import { Observation, CreateObservationRequest } from '@/types/appointments/medicalAppointmentTypesPage';
 import Button from '@/components/ui/Button';
 
 interface ObservationsProps {
