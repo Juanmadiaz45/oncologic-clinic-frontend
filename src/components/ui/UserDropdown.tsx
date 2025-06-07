@@ -1,20 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDownIcon, UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
-import authService from '@/services/auth/authService';
+import {
+  ChevronDownIcon,
+  UserCircleIcon,
+  ArrowRightStartOnRectangleIcon,
+} from '@heroicons/react/24/outline';
+import { useAuth } from '@/hooks/useAuth';
 
 interface UserDropdownProps {
-  username: string;
   userAvatar?: string;
 }
 
-const UserDropdown: React.FC<UserDropdownProps> = ({ username, userAvatar }) => {
+const UserDropdown: React.FC<UserDropdownProps> = ({ userAvatar }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { logout, userRoles, username } = useAuth();
 
-  // Cerrar dropdown al hacer click fuera
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -25,14 +32,20 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ username, userAvatar }) => 
 
   const handleLogout = () => {
     setIsOpen(false);
-    authService.logout();
+    logout();
   };
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
-  // Obtener iniciales del nombre de usuario para el avatar por defecto
+  const handleViewProfile = () => {
+    setIsOpen(false);
+    // TODO: Add navigation to profile page when implemented
+    console.log('Ver perfil - functionality not implemented yet');
+  };
+
+  // Get username initials for default avatar
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -40,6 +53,15 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ username, userAvatar }) => 
       .join('')
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  // Get user role display text
+  const getUserRoleDisplay = () => {
+    if (userRoles.includes('ADMIN')) return 'Administrador';
+    if (userRoles.includes('DOCTOR')) return 'Doctor';
+    if (userRoles.includes('ADMINISTRATIVE')) return 'Administrativo';
+    if (userRoles.includes('PATIENT')) return 'Paciente';
+    return 'Usuario';
   };
 
   return (
@@ -54,12 +76,12 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ username, userAvatar }) => 
           {userAvatar ? (
             <img
               src={userAvatar}
-              alt={username}
+              alt={username || 'Usuario'}
               className="h-8 w-8 rounded-full object-cover border-2 border-gray-200"
             />
           ) : (
             <div className="h-8 w-8 bg-clinic-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-              {getInitials(username)}
+              {getInitials(username || 'Usuario')}
             </div>
           )}
           <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-green-400 border-2 border-white rounded-full"></div>
@@ -67,15 +89,17 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ username, userAvatar }) => 
 
         {/* Username */}
         <div className="hidden sm:block">
-          <div className="text-sm font-medium text-gray-900">{username}</div>
+          <div className="text-sm font-medium text-gray-900">
+            {username || 'Usuario'}
+          </div>
           <div className="text-xs text-gray-500">En línea</div>
         </div>
 
         {/* Chevron */}
-        <ChevronDownIcon 
+        <ChevronDownIcon
           className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${
             isOpen ? 'rotate-180' : ''
-          }`} 
+          }`}
         />
       </button>
 
@@ -88,17 +112,21 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ username, userAvatar }) => 
               {userAvatar ? (
                 <img
                   src={userAvatar}
-                  alt={username}
+                  alt={username || 'Usuario'}
                   className="h-10 w-10 rounded-full object-cover"
                 />
               ) : (
                 <div className="h-10 w-10 bg-clinic-500 rounded-full flex items-center justify-center text-white font-medium">
-                  {getInitials(username)}
+                  {getInitials(username || 'Usuario')}
                 </div>
               )}
               <div>
-                <div className="text-sm font-medium text-gray-900">{username}</div>
-                <div className="text-xs text-gray-500">Doctor</div>
+                <div className="text-sm font-medium text-gray-900">
+                  {username || 'Usuario'}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {getUserRoleDisplay()}
+                </div>
               </div>
             </div>
           </div>
@@ -106,24 +134,20 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ username, userAvatar }) => 
           {/* Menu items */}
           <div className="py-1">
             <button
-              onClick={() => {
-                setIsOpen(false);
-                // Aquí puedes agregar navegación al perfil
-                console.log('Ver perfil');
-              }}
+              onClick={handleViewProfile}
               className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-clinic-600 transition-colors duration-200"
             >
               <UserCircleIcon className="h-4 w-4 mr-3" />
               Ver Perfil
             </button>
-            
+
             <div className="border-t border-gray-100 my-1"></div>
-            
+
             <button
               onClick={handleLogout}
               className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
             >
-              <ArrowRightOnRectangleIcon className="h-4 w-4 mr-3" />
+              <ArrowRightStartOnRectangleIcon className="h-4 w-4 mr-3" />
               Cerrar Sesión
             </button>
           </div>

@@ -1,7 +1,7 @@
-// src/store/slices/appointment/reducers/taskReducers.ts
 import { PayloadAction } from '@reduxjs/toolkit';
 import { AppointmentState } from '../types/state';
 import { MedicalTask } from '@/types';
+import { calculateAppointmentDuration } from '@/utils/appointmentUtils';
 
 export const taskReducers = {
   addMedicalTask: (
@@ -9,12 +9,17 @@ export const taskReducers = {
     action: PayloadAction<MedicalTask>
   ) => {
     state.formData.medicalTasks.push(action.payload);
-    const totalTaskTime = state.formData.medicalTasks.reduce(
+
+    // Recalculate duration using the new logic
+    const baseDuration = state.formData.medicalTasks.reduce(
       (sum, task) => sum + task.estimatedTime,
       0
     );
-    state.formData.duration = totalTaskTime + Math.ceil(totalTaskTime * 0.15);
+
+    state.formData.baseDuration = baseDuration;
+    state.formData.duration = calculateAppointmentDuration(baseDuration, 15);
   },
+
   removeMedicalTask: (
     state: AppointmentState,
     action: PayloadAction<number>
@@ -22,10 +27,14 @@ export const taskReducers = {
     state.formData.medicalTasks = state.formData.medicalTasks.filter(
       task => task.id !== action.payload
     );
-    const totalTaskTime = state.formData.medicalTasks.reduce(
+
+    // Recalculate duration using the new logic
+    const baseDuration = state.formData.medicalTasks.reduce(
       (sum, task) => sum + task.estimatedTime,
       0
     );
-    state.formData.duration = totalTaskTime + Math.ceil(totalTaskTime * 0.15);
+
+    state.formData.baseDuration = baseDuration;
+    state.formData.duration = calculateAppointmentDuration(baseDuration, 15);
   },
 };

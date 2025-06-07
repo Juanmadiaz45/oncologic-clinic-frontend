@@ -5,10 +5,6 @@ export const ROUTES = {
   LOGIN: '/login',
   DASHBOARD: '/dashboard',
 
-  // Create Appointment
-  APPOINTMENT_CREATE_STEP1: '/appointments/create/step1',
-  APPOINTMENT_CREATE_STEP2: '/appointments/create/step2',
-
   // Patients
   PATIENTS: '/patients',
   PATIENT_DETAIL: '/patients/:id',
@@ -19,11 +15,14 @@ export const ROUTES = {
   APPOINTMENTS: '/appointments',
   APPOINTMENT_DETAIL: '/appointments/:id',
   APPOINTMENT_CREATE: '/appointments/create',
+  // Create Appointment
+  APPOINTMENT_CREATE_STEP1: '/appointments/create/step1',
+  APPOINTMENT_CREATE_STEP2: '/appointments/create/step2',
   APPOINTMENT_EDIT: '/appointments/:id/edit',
 
   // Staff
   PERSONAL: '/staff/personal',
-  
+
   DOCTORS: '/staff/doctors',
   DOCTOR_DETAIL: '/staff/doctors/:id',
   DOCTOR_CREATE: '/staff/doctors/create',

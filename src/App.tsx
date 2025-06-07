@@ -30,7 +30,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { ROUTES } from '@/constants';
 
 function App() {
-  const { initialize, isInitialized, isLoading, isAuthenticated, isAdmin, isDoctor } = useAuth();
+  const {
+    initialize,
+    isInitialized,
+    isLoading,
+    isAuthenticated,
+    isAdmin,
+    isDoctor,
+  } = useAuth();
 
   // Initialize auth on app start
   useEffect(() => {

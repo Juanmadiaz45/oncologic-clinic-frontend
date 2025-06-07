@@ -1,8 +1,8 @@
 import React from 'react';
-import { 
-  CalendarDaysIcon, 
+import {
+  CalendarDaysIcon,
   ArrowPathIcon,
-  Bars3Icon
+  Bars3Icon,
 } from '@heroicons/react/24/outline';
 import MetricCard from '@/components/ui/MetricCard';
 import UserDropdown from '@/components/ui/UserDropdown';
@@ -21,7 +21,9 @@ const DoctorDashboard: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <ArrowPathIcon className="mx-auto h-12 w-12 text-clinic-500 animate-spin" />
-          <p className="mt-4 text-lg font-medium text-gray-600">Cargando dashboard...</p>
+          <p className="mt-4 text-lg font-medium text-gray-600">
+            Cargando dashboard...
+          </p>
         </div>
       </div>
     );
@@ -32,7 +34,9 @@ const DoctorDashboard: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-md">
           <div className="bg-white border border-red-200 rounded-xl p-8 shadow-soft">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Error al cargar</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Error al cargar
+            </h3>
             <p className="text-red-600 mb-6">{error}</p>
             <button
               onClick={refreshData}
@@ -65,11 +69,15 @@ const DoctorDashboard: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-clinic-600">OncoLogic</h1>
-                  <p className="text-xs text-gray-500">Sistema de Gestión Clínica</p>
+                  <h1 className="text-xl font-bold text-clinic-600">
+                    OncoLogic
+                  </h1>
+                  <p className="text-xs text-gray-500">
+                    Sistema de Gestión Clínica
+                  </p>
                 </div>
               </div>
-              
+
               <nav className="hidden md:flex space-x-1">
                 <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-clinic-600 bg-clinic-50 rounded-lg">
                   <Bars3Icon className="h-4 w-4" />
@@ -77,7 +85,7 @@ const DoctorDashboard: React.FC = () => {
                 </button>
               </nav>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <button
                 onClick={refreshData}
@@ -86,8 +94,8 @@ const DoctorDashboard: React.FC = () => {
               >
                 <ArrowPathIcon className="h-5 w-5" />
               </button>
-              
-              <UserDropdown username={currentUser?.username || 'Doctor'} />
+
+              <UserDropdown />
             </div>
           </div>
         </div>
@@ -98,7 +106,9 @@ const DoctorDashboard: React.FC = () => {
           <h2 className="text-2xl font-bold text-gray-900">
             ¡Bienvenido, Dr. {currentUser?.username}!
           </h2>
-          <p className="text-gray-600 mt-1">Aquí tiene un resumen de su jornada</p>
+          <p className="text-gray-600 mt-1">
+            Aquí tiene un resumen de su jornada
+          </p>
         </div>
 
         {/* Layout principal con alturas iguales */}
@@ -112,16 +122,16 @@ const DoctorDashboard: React.FC = () => {
               color="clinic"
               icon={<CalendarDaysIcon className="h-6 w-6" />}
             />
-            
+
             {/* Card 2: Fecha */}
             <div className="bg-white rounded-xl shadow-card border border-gray-200 p-4 text-center">
               <div className="text-2xl font-bold text-clinic-600 mb-1">
                 {metrics.currentDate}
               </div>
               <div className="text-sm text-gray-600">
-                {new Date().toLocaleDateString('es-ES', { 
-                  month: 'long', 
-                  year: 'numeric' 
+                {new Date().toLocaleDateString('es-ES', {
+                  month: 'long',
+                  year: 'numeric',
                 })}
               </div>
               <div className="text-xs text-clinic-500 font-medium mt-1">
@@ -148,24 +158,35 @@ const DoctorDashboard: React.FC = () => {
 
         {/* Estadísticas del día */}
         <div className="bg-white rounded-xl shadow-card border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Estadísticas del Día</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+            Estadísticas del Día
+          </h3>
           <div className="flex justify-center">
             <div className="grid grid-cols-3 gap-8 text-center max-w-md">
               <div>
                 <div className="text-2xl font-bold text-clinic-600">
-                  {todayAppointments.filter(a => a.status === 'COMPLETED').length}
+                  {
+                    todayAppointments.filter(a => a.status === 'COMPLETED')
+                      .length
+                  }
                 </div>
                 <div className="text-sm text-gray-600">Completadas</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-green-600">
-                  {todayAppointments.filter(a => a.status === 'IN_PROGRESS').length}
+                  {
+                    todayAppointments.filter(a => a.status === 'IN_PROGRESS')
+                      .length
+                  }
                 </div>
                 <div className="text-sm text-gray-600">En progreso</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-yellow-600">
-                  {todayAppointments.filter(a => a.status === 'SCHEDULED').length}
+                  {
+                    todayAppointments.filter(a => a.status === 'SCHEDULED')
+                      .length
+                  }
                 </div>
                 <div className="text-sm text-gray-600">Programadas</div>
               </div>

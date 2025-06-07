@@ -31,6 +31,7 @@ export const initialState: AppointmentState = {
     patient: null,
     appointmentTypeId: null,
     baseAppointmentId: null,
+    baseDuration: 0, // New property
     duration: 0,
     medicalTasks: [],
   },

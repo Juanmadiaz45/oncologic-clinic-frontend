@@ -2,13 +2,14 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '@/services/api/client';
 import { MedicalAppointment } from '@/types';
 import { AppointmentType } from '@/types';
+import { API_ENDPOINTS } from '@/constants';
 
 export const loadAppointmentTypes = createAsyncThunk(
   'appointment/loadAppointmentTypes',
   async () => {
     // First we get the base appointments
     const baseAppointments = await api.get<MedicalAppointment[]>(
-      '/medical-appointments/base'
+      `${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/base`
     );
 
     // We get the unique types
@@ -23,7 +24,7 @@ export const loadAppointmentTypes = createAsyncThunk(
     // Fetch appointment types
     const queryString = typeIds.map(id => `ids=${id}`).join('&');
     const appointmentTypes = await api.get<AppointmentType[]>(
-      `/medical-appointment-types/by-ids?${queryString}`
+      `${API_ENDPOINTS.APPOINTMENT_TYPES}/by-ids?${queryString}`
     );
 
     return {

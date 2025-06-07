@@ -6,7 +6,8 @@ export interface AppointmentFormData {
   patient: Patient | null;
   appointmentTypeId: number | null;
   baseAppointmentId: number | null;
-  duration: number;
+  baseDuration: number; // Base duration without buffering or rounding
+  duration: number; // Final duration with buffer and rounding to X min
   medicalTasks: MedicalTask[];
 
   // Step 2
