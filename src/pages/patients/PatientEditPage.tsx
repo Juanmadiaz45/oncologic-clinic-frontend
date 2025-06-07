@@ -43,6 +43,7 @@ const PatientEditPage: React.FC = () => {
     
     return {
       id: patient.id,
+      idNumber: patient.idNumber,
       name: patient.name,
       birthDate: patient.birthDate,
       gender: patient.gender,
