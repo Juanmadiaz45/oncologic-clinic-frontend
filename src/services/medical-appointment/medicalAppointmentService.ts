@@ -12,6 +12,12 @@ import {
   CreatePrescribedMedicineRequest
 } from '@/types/appointments/medicalAppointmentTypesPage';
 
+  interface AppointmentResult {
+    id: number;
+    evaluationDate: string;
+    medicalHistoryId: number;
+  }
+
 class MedicalAppointmentService {
   // ===== CITA MÉDICA =====
   async getAppointmentDetails(appointmentId: number): Promise<MedicalAppointment> {
@@ -51,7 +57,7 @@ class MedicalAppointmentService {
   }
 
   async createObservation(data: CreateObservationRequest): Promise<Observation> {
-    const appointmentResult = await api.get(
+    const appointmentResult = await api.get<AppointmentResult>(
       `${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${data.medicalAppointmentId}/appointment-result`
     );
     
@@ -70,7 +76,7 @@ class MedicalAppointmentService {
   }
 
   async createTreatment(data: CreateTreatmentRequest): Promise<Treatment> {
-    const appointmentResult = await api.get(
+    const appointmentResult = await api.get<AppointmentResult>(
       `${API_ENDPOINTS.MEDICAL_APPOINTMENTS}/${data.medicalAppointmentId}/appointment-result`
     );
     
