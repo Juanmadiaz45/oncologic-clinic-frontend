@@ -22,12 +22,14 @@ export const useMedicalHistory = (patientId?: number) => {
   const stats = useAppSelector(selectMedicalHistoryStats);
 
   // Actions
-  const fetchMedicalHistory = useCallback((id: number) => {
-    dispatch(asyncActions.fetchMedicalHistory(id));
-  }, [dispatch]);
+  const fetchMedicalHistory = useCallback(() => {
+    if (patientId) {
+      dispatch(asyncActions.fetchMedicalHistory(patientId));
+    }
+  }, [dispatch, patientId]);
 
   const updateHealthStatus = useCallback((historyId: number, healthStatus: string) => {
-    dispatch(asyncActions.updateHealthStatus({ historyId, healthStatus }));
+    return dispatch(asyncActions.updateHealthStatus({ historyId, healthStatus })).unwrap();
   }, [dispatch]);
 
   const clearMedicalHistoryError = useCallback(() => {
@@ -45,7 +47,7 @@ export const useMedicalHistory = (patientId?: number) => {
                          (new Date().getTime() - new Date(lastUpdated).getTime()) > 5 * 60 * 1000; // 5 minutes
       
       if (shouldFetch) {
-        fetchMedicalHistory(patientId);
+        fetchMedicalHistory();
       }
     }
   }, [patientId, dispatch, currentPatientId, medicalHistory, lastUpdated, fetchMedicalHistory]);
@@ -56,7 +58,7 @@ export const useMedicalHistory = (patientId?: number) => {
     error,
     lastUpdated,
     stats,
-    fetchMedicalHistory: () => patientId && fetchMedicalHistory(patientId),
+    fetchMedicalHistory,
     updateHealthStatus,
     clearError: clearMedicalHistoryError
   };

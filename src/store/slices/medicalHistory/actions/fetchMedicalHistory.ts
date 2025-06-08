@@ -1,5 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import medicalHistoryService from '@/services/api/medicalHistoryService';
+import medicalHistoryDetailsService from '@/services/api/medicalHistoryDetailsService';
+import { RootState } from '@/store';
 
 export const fetchMedicalHistory = createAsyncThunk(
   'medicalHistory/fetchMedicalHistory',
@@ -7,9 +9,36 @@ export const fetchMedicalHistory = createAsyncThunk(
     try {
       const medicalHistory = await medicalHistoryService.getMedicalHistoryByPatientId(patientId);
       return { medicalHistory, patientId };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching medical history:', error);
       return rejectWithValue('Error al cargar el historial médico del paciente');
+    }
+  }
+);
+
+export const fetchTimelineWithRealDates = createAsyncThunk(
+  'medicalHistory/fetchTimelineWithRealDates',
+  async (medicalHistoryId: number, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const medicalHistory = state.medicalHistory.medicalHistory;
+      
+      if (!medicalHistory) {
+        throw new Error('No se encontró el historial médico');
+      }
+
+      const timelineEvents = await medicalHistoryDetailsService.getMedicalHistoryTimeline(
+        medicalHistory.medicalAppointmentIds,
+        medicalHistory.appointmentResultIds,
+        medicalHistory.medicalExaminationIds,
+        medicalHistory.examinationResultIds,
+        medicalHistory.creationDate
+      );
+
+      return timelineEvents;
+    } catch (error: unknown) {
+      console.error('Error fetching timeline with real dates:', error);
+      return rejectWithValue('Error al cargar las fechas reales del timeline');
     }
   }
 );
@@ -20,7 +49,7 @@ export const updateHealthStatus = createAsyncThunk(
     try {
       await medicalHistoryService.updateHealthStatus(params.historyId, params.healthStatus);
       return params.healthStatus;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error updating health status:', error);
       return rejectWithValue('Error al actualizar el estado de salud');
     }

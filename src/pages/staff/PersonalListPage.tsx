@@ -5,7 +5,7 @@ import { PersonalTable } from '@/components/tables/PersonalTable';
 import { usePersonal } from '@/hooks/usePersonal';
 import { doctorService, administrativeService } from '@/services/api/personalService';
 import { DoctorResponseDTO, AdministrativeResponseDTO } from '@/types/personal';
-import { ROUTES, MESSAGES } from '@/constants';
+import { ROUTES } from '@/constants';
 
 type PersonalWithType = (DoctorResponseDTO | AdministrativeResponseDTO) & { type: 'DOCTOR' | 'ADMINISTRATIVE' };
 
@@ -40,32 +40,47 @@ const PersonalListPage: React.FC = () => {
   };
 
   const handleDeletePerson = async (person: PersonalWithType) => {
-    const personName = `${person.personalData.name} ${person.personalData.lastName}`;
-    const personType = person.type === 'DOCTOR' ? 'doctor' : 'administrativo';
-    
-    if (!window.confirm(`¿Está seguro de que desea eliminar al ${personType} ${personName}?`)) {
-      return;
-    }
-
-    setDeletingId(person.id);
-    try {
-      if (person.type === 'DOCTOR') {
-        await doctorService.deleteDoctor(person.id);
-      } else {
-        await administrativeService.deleteAdministrative(person.id);
+      if (!person.id) {
+        setAlert({
+          type: 'error',
+          message: 'Error: No se puede eliminar - ID del personal no válido'
+        });
+        return;
       }
+
+      const personName = `${person.personalData.name} ${person.personalData.lastName}`;
+      const personType = person.type === 'DOCTOR' ? 'doctor' : 'administrativo';
       
-      setAlert({ type: 'success', message: MESSAGES.SUCCESS.DELETE });
-      refetch();
-    } catch (error) {
-      console.error('Error deleting person:', error);
-      setAlert({ 
-        type: 'error', 
-        message: error instanceof Error ? error.message : MESSAGES.ERROR.DELETE 
-      });
-    } finally {
-      setDeletingId(null);
-    }
+      if (!window.confirm(`¿Está seguro de que desea eliminar al ${personType} ${personName}?`)) {
+        return;
+      }
+
+      setDeletingId(person.id);
+      try {
+        if (person.type === 'DOCTOR') {
+          await doctorService.deleteDoctor(person.id);
+        } else {
+          await administrativeService.deleteAdministrative(person.id);
+        }
+        
+        setAlert({
+          type: 'success',
+          message: `${personType.charAt(0).toUpperCase() + personType.slice(1)} eliminado exitosamente`
+        });
+        refetch();
+        
+      } catch (error: unknown) {
+        console.error('Error deleting person:', error);
+        
+        const errorMessage = 'No se puede eliminar este profesional porque tiene citas médicas asociadas.';
+        
+        setAlert({
+          type: 'error',
+          message: errorMessage
+        });
+      } finally {
+        setDeletingId(null);
+      }
   };
 
   if (error) {

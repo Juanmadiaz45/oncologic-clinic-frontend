@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Alert, Card } from '@/components/ui';
 import { MedicalHistoryTimeline } from '@/components/medicalHistory/MedicalHistoryTimeline';
-import { TreatmentsList } from '@/components/medicalHistory/TreatmentsList';
-import { ObservationsList } from '@/components/medicalHistory/ObservationsList';
 import { MedicalHistoryStats } from '@/components/medicalHistory/MedicalHistoryStats';
 import { useMedicalHistory } from '@/hooks/useMedicalHistory';
 import { usePatient } from '@/hooks/usePatient';
 import { ROUTES } from '@/constants';
-import { ArrowPathIcon } from '@heroicons/react/24/outline';
+import { ArrowPathIcon, PencilIcon } from '@heroicons/react/24/outline';
 
 const PatientMedicalHistoryPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const patientId = id ? parseInt(id, 10) : undefined;
+  
+  const [isEditingHealthStatus, setIsEditingHealthStatus] = useState(false);
+  const [newHealthStatus, setNewHealthStatus] = useState('');
   
   const { patient, loading: patientLoading } = usePatient(patientId);
   const { 
@@ -22,6 +23,7 @@ const PatientMedicalHistoryPage: React.FC = () => {
     error, 
     stats,
     fetchMedicalHistory,
+    updateHealthStatus,
     clearError 
   } = useMedicalHistory(patientId);
 
@@ -32,6 +34,31 @@ const PatientMedicalHistoryPage: React.FC = () => {
   console.log('📈 Stats:', stats);
 
   const isLoading = patientLoading || historyLoading;
+
+  const handleEditHealthStatus = () => {
+    if (medicalHistory) {
+      setNewHealthStatus(medicalHistory.currentHealthStatus);
+      setIsEditingHealthStatus(true);
+    }
+  };
+
+  const handleSaveHealthStatus = async () => {
+    if (medicalHistory && newHealthStatus.trim() && newHealthStatus !== medicalHistory.currentHealthStatus) {
+      try {
+        await updateHealthStatus(medicalHistory.id, newHealthStatus);
+        setIsEditingHealthStatus(false);
+      } catch (error) {
+        console.error('Error updating health status:', error);
+      }
+    } else {
+      setIsEditingHealthStatus(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingHealthStatus(false);
+    setNewHealthStatus('');
+  };
 
   if (error) {
     return (
@@ -192,7 +219,43 @@ const PatientMedicalHistoryPage: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-500">Estado de Salud Actual</label>
-                <p className="mt-1 text-sm text-gray-900">{medicalHistory.currentHealthStatus}</p>
+                <div className="mt-1 flex items-center space-x-2">
+                  {isEditingHealthStatus ? (
+                    <div className="flex-1 flex items-center space-x-2">
+                      <textarea
+                        value={newHealthStatus}
+                        onChange={(e) => setNewHealthStatus(e.target.value)}
+                        className="flex-1 text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-clinic-500"
+                        rows={2}
+                      />
+                      <div className="flex flex-col space-y-1">
+                        <button
+                          onClick={handleSaveHealthStatus}
+                          className="text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700"
+                        >
+                          Guardar
+                        </button>
+                        <button
+                          onClick={handleCancelEdit}
+                          className="text-xs bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex-1 flex items-center justify-between">
+                      <p className="text-sm text-gray-900">{medicalHistory.currentHealthStatus}</p>
+                      <button
+                        onClick={handleEditHealthStatus}
+                        className="p-1 text-gray-400 hover:text-clinic-600 transition-colors duration-200"
+                        title="Editar estado de salud"
+                      >
+                        <PencilIcon className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </Card>
@@ -201,19 +264,132 @@ const PatientMedicalHistoryPage: React.FC = () => {
         {/* Statistics */}
         <MedicalHistoryStats stats={stats} loading={historyLoading} />
 
-        {/* Grid Layout */}
+        {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column */}
-          <div className="space-y-8">
-            {/* ✅ Pasar medicalHistory completo en lugar de solo treatments */}
-            <TreatmentsList medicalHistory={medicalHistory} />
-            <ObservationsList medicalHistory={medicalHistory} />
+          {/* Left Column - Summary Cards */}
+          <div className="space-y-6">
+            {/* Citas Médicas */}
+            <Card title="Citas Médicas Registradas">
+              <div className="space-y-3">
+                {medicalHistory.medicalAppointmentIds.length === 0 ? (
+                  <p className="text-gray-500 text-center py-6">No hay citas médicas registradas</p>
+                ) : (
+                  medicalHistory.medicalAppointmentIds.map((appointmentId) => (
+                    <div key={appointmentId} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-gray-900">Cita Médica #{appointmentId}</h4>
+                          <p className="text-sm text-gray-500">Consulta médica registrada</p>
+                        </div>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          Registrada
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </Card>
+
+            {/* Resultados de Citas */}
+            <Card title="Resultados de Consultas">
+              <div className="space-y-3">
+                {medicalHistory.appointmentResultIds.length === 0 ? (
+                  <p className="text-gray-500 text-center py-6">No hay resultados de consultas registrados</p>
+                ) : (
+                  medicalHistory.appointmentResultIds.map((resultId) => (
+                    <div key={resultId} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-gray-900">Resultado de Consulta #{resultId}</h4>
+                          <p className="text-sm text-gray-500">Evaluación médica completada</p>
+                        </div>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Completado
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </Card>
           </div>
 
           {/* Right Column */}
-          <div>
-            <MedicalHistoryTimeline medicalHistory={medicalHistory} />
+          <div className="space-y-6">
+            {/* Exámenes Médicos */}
+            <Card title="Exámenes Médicos">
+              <div className="space-y-3">
+                {medicalHistory.medicalExaminationIds.length === 0 ? (
+                  <p className="text-gray-500 text-center py-6">No hay exámenes médicos registrados</p>
+                ) : (
+                  medicalHistory.medicalExaminationIds.map((examId) => (
+                    <div key={examId} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-gray-900">Examen {examId}</h4>
+                          <p className="text-sm text-gray-500">Estudio médico realizado</p>
+                        </div>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                          Realizado
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </Card>
+
+            {/* Resultados de Exámenes */}
+            <Card title="Resultados de Exámenes">
+              <div className="space-y-3">
+                {medicalHistory.examinationResultIds.length === 0 ? (
+                  <p className="text-gray-500 text-center py-6">No hay resultados de exámenes disponibles</p>
+                ) : (
+                  medicalHistory.examinationResultIds.map((resultId) => (
+                    <div key={resultId} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-gray-900">Resultado de Examen #{resultId}</h4>
+                          <p className="text-sm text-gray-500">Informe de laboratorio disponible</p>
+                        </div>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                          Disponible
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </Card>
           </div>
+        </div>
+
+        {/* Timeline Section */}
+        <div className="mt-8">
+          <MedicalHistoryTimeline medicalHistory={medicalHistory} />
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mt-8">
+          <Card title="Acciones Rápidas">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Button
+                  variant="primary"
+                  className="w-full justify-center"
+                  onClick={() => alert('Función próximamente disponible')}
+              >
+                  📅 Nueva Cita
+              </Button>
+              <Button
+                  variant="secondary"
+                  className="w-full justify-center"
+                  onClick={() => alert('Función próximamente disponible')}
+              >
+                  🔬 Nuevo Examen
+              </Button>
+              </div>
+          </Card>
         </div>
       </div>
     </div>

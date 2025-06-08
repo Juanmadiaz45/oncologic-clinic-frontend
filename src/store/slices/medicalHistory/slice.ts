@@ -38,9 +38,11 @@ const medicalHistorySlice = createSlice({
           state.medicalHistory.currentHealthStatus = action.payload;
           state.lastUpdated = new Date().toISOString();
         }
+        state.isLoading = false;
         state.error = null;
       })
       .addCase(updateHealthStatus.rejected, (state, action) => {
+        state.isLoading = false;
         state.error = action.payload as string;
       });
   }

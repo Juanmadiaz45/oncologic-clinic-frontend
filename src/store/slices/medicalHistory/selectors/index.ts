@@ -12,41 +12,22 @@ export const selectMedicalHistoryLastUpdated = (state: RootState) => state.medic
 
 export const selectCurrentPatientId = (state: RootState) => state.medicalHistory.currentPatientId;
 
+// Computed selectors
 export const selectMedicalHistoryStats = (state: RootState) => {
   const medicalHistory = state.medicalHistory.medicalHistory;
-  
   if (!medicalHistory) {
     return {
       totalAppointments: 0,
-      totalTreatments: 0,
-      activeTreatments: 0,
-      totalObservations: 0,
-      totalExaminations: 0
+      totalExaminations: 0,
+      totalAppointmentResults: 0,
+      totalExaminationResults: 0
     };
   }
 
-  const totalAppointments = Array.isArray(medicalHistory.medicalAppointmentIds) 
-    ? medicalHistory.medicalAppointmentIds.length 
-    : 0;
-    
-  const totalExaminations = Array.isArray(medicalHistory.medicalExaminationIds) 
-    ? medicalHistory.medicalExaminationIds.length 
-    : 0;
-
-  const appointmentResultsCount = Array.isArray(medicalHistory.appointmentResultIds) 
-    ? medicalHistory.appointmentResultIds.length 
-    : 0;
-
-  const estimatedTreatments = appointmentResultsCount;
-  const estimatedObservations = appointmentResultsCount;
-
-  const estimatedActiveTreatments = Math.ceil(estimatedTreatments / 2);
-
   return {
-    totalAppointments,
-    totalTreatments: estimatedTreatments,
-    activeTreatments: estimatedActiveTreatments,
-    totalObservations: estimatedObservations,
-    totalExaminations
+    totalAppointments: medicalHistory.medicalAppointmentIds?.length || 0,
+    totalExaminations: medicalHistory.medicalExaminationIds?.length || 0,
+    totalAppointmentResults: medicalHistory.appointmentResultIds?.length || 0,
+    totalExaminationResults: medicalHistory.examinationResultIds?.length || 0
   };
 };

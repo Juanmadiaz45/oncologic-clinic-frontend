@@ -1,56 +1,48 @@
 import React from 'react';
 import { 
   CalendarDaysIcon, 
-  HeartIcon,
   ClipboardDocumentListIcon,
   BeakerIcon,
-  CheckCircleIcon
+  DocumentChartBarIcon
 } from '@heroicons/react/24/outline';
 import MetricCard from '@/components/ui/MetricCard';
 
 interface MedicalHistoryStatsProps {
   stats: {
     totalAppointments: number;
-    totalTreatments: number;
-    activeTreatments: number;
-    totalObservations: number;
     totalExaminations: number;
+    totalAppointmentResults: number;
+    totalExaminationResults: number;
   };
   loading: boolean;
 }
 
 export const MedicalHistoryStats: React.FC<MedicalHistoryStatsProps> = ({ stats, loading }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
       <MetricCard
-        value={loading ? "..." : stats.totalAppointments ?? 0}
+        value={loading ? "..." : stats.totalAppointments}
         label="Citas Médicas"
         color="clinic"
         icon={<CalendarDaysIcon className="h-6 w-6" />}
       />
       <MetricCard
-        value={loading ? "..." : stats.totalTreatments}
-        label="Tratamientos"
+        value={loading ? "..." : stats.totalExaminations}
+        label="Exámenes Médicos"
         color="purple"
-        icon={<HeartIcon className="h-6 w-6" />}
+        icon={<BeakerIcon className="h-6 w-6" />}
       />
       <MetricCard
-        value={loading ? "..." : stats.activeTreatments}
-        label="Activos"
+        value={loading ? "..." : stats.totalAppointmentResults}
+        label="Resultados de Citas"
         color="green"
-        icon={<CheckCircleIcon className="h-6 w-6" />}
-      />
-      <MetricCard
-        value={loading ? "..." : stats.totalObservations}
-        label="Observaciones"
-        color="yellow"
         icon={<ClipboardDocumentListIcon className="h-6 w-6" />}
       />
       <MetricCard
-        value={loading ? "..." : stats.totalExaminations}
-        label="Exámenes"
-        color="red"
-        icon={<BeakerIcon className="h-6 w-6" />}
+        value={loading ? "..." : stats.totalExaminationResults}
+        label="Resultados de Exámenes"
+        color="yellow"
+        icon={<DocumentChartBarIcon className="h-6 w-6" />}
       />
     </div>
   );
