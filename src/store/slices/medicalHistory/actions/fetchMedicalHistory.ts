@@ -9,7 +9,7 @@ export const fetchMedicalHistory = createAsyncThunk(
     try {
       const medicalHistory = await medicalHistoryService.getMedicalHistoryByPatientId(patientId);
       return { medicalHistory, patientId };
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Error fetching medical history:', error);
       return rejectWithValue('Error al cargar el historial médico del paciente');
     }
@@ -34,9 +34,9 @@ export const fetchTimelineWithRealDates = createAsyncThunk(
         medicalHistory.examinationResultIds,
         medicalHistory.creationDate
       );
-
+      
       return timelineEvents;
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Error fetching timeline with real dates:', error);
       return rejectWithValue('Error al cargar las fechas reales del timeline');
     }
@@ -49,7 +49,7 @@ export const updateHealthStatus = createAsyncThunk(
     try {
       await medicalHistoryService.updateHealthStatus(params.historyId, params.healthStatus);
       return params.healthStatus;
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Error updating health status:', error);
       return rejectWithValue('Error al actualizar el estado de salud');
     }
