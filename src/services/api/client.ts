@@ -43,6 +43,7 @@ export const setAuthToken = (token: string | null) => {
   console.log('Token configured:', token ? 'Yes' : 'No');
 };
 
+
 export const getAuthToken = () => authToken;
 
 export const clearAuthToken = () => {
@@ -379,5 +380,6 @@ declare module 'axios' {
     };
   }
 }
+
 
 export default apiClient;
