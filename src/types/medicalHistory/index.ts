@@ -4,10 +4,16 @@ export interface MedicalHistoryDetail extends BaseEntity {
   patientId: number;
   creationDate: string;
   currentHealthStatus: string;
-  medicalAppointments: MedicalAppointmentSummary[];
-  appointmentResults: AppointmentResultDetail[];
-  treatments: TreatmentDetail[];
-  medicalExaminations: MedicalExaminationSummary[];
+  
+  medicalAppointments?: MedicalAppointmentSummary[];
+  appointmentResults?: AppointmentResultDetail[];
+  treatments?: TreatmentDetail[];
+  medicalExaminations?: MedicalExaminationSummary[];
+  
+  medicalAppointmentIds?: number[];
+  appointmentResultIds?: number[];
+  examinationResultIds?: number[];
+  medicalExaminationIds?: string[];
 }
 
 export interface MedicalAppointmentSummary extends BaseEntity {

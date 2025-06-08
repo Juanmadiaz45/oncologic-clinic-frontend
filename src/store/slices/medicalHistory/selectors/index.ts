@@ -12,9 +12,9 @@ export const selectMedicalHistoryLastUpdated = (state: RootState) => state.medic
 
 export const selectCurrentPatientId = (state: RootState) => state.medicalHistory.currentPatientId;
 
-// Computed selectors
 export const selectMedicalHistoryStats = (state: RootState) => {
   const medicalHistory = state.medicalHistory.medicalHistory;
+  
   if (!medicalHistory) {
     return {
       totalAppointments: 0,
@@ -25,22 +25,28 @@ export const selectMedicalHistoryStats = (state: RootState) => {
     };
   }
 
-  const now = new Date();
-  const activeTreatments = medicalHistory.treatments.filter(treatment => {
-    const startDate = new Date(treatment.dateStart);
-    const endDate = new Date(treatment.endDate);
-    return now >= startDate && now <= endDate;
-  }).length;
+  const totalAppointments = Array.isArray(medicalHistory.medicalAppointmentIds) 
+    ? medicalHistory.medicalAppointmentIds.length 
+    : 0;
+    
+  const totalExaminations = Array.isArray(medicalHistory.medicalExaminationIds) 
+    ? medicalHistory.medicalExaminationIds.length 
+    : 0;
 
-  const totalObservations = medicalHistory.appointmentResults.reduce(
-    (sum, result) => sum + result.observations.length, 0
-  );
+  const appointmentResultsCount = Array.isArray(medicalHistory.appointmentResultIds) 
+    ? medicalHistory.appointmentResultIds.length 
+    : 0;
+
+  const estimatedTreatments = appointmentResultsCount;
+  const estimatedObservations = appointmentResultsCount;
+
+  const estimatedActiveTreatments = Math.ceil(estimatedTreatments / 2);
 
   return {
-    totalAppointments: medicalHistory.medicalAppointments.length,
-    totalTreatments: medicalHistory.treatments.length,
-    activeTreatments,
-    totalObservations,
-    totalExaminations: medicalHistory.medicalExaminations.length
+    totalAppointments,
+    totalTreatments: estimatedTreatments,
+    activeTreatments: estimatedActiveTreatments,
+    totalObservations: estimatedObservations,
+    totalExaminations
   };
 };

@@ -205,8 +205,9 @@ const PatientMedicalHistoryPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column */}
           <div className="space-y-8">
-            <TreatmentsList treatments={medicalHistory.treatments} />
-            <ObservationsList appointmentResults={medicalHistory.appointmentResults} />
+            {/* ✅ Pasar medicalHistory completo en lugar de solo treatments */}
+            <TreatmentsList medicalHistory={medicalHistory} />
+            <ObservationsList medicalHistory={medicalHistory} />
           </div>
 
           {/* Right Column */}
