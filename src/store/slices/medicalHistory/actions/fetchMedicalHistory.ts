@@ -23,8 +23,8 @@ export const fetchTimelineWithRealDates = createAsyncThunk(
       const state = getState() as RootState;
       const medicalHistory = state.medicalHistory.medicalHistory;
       
-      if (!medicalHistory) {
-        throw new Error('No se encontró el historial médico');
+      if (!medicalHistory || medicalHistory.id !== medicalHistoryId) {
+        throw new Error('No se encontró el historial médico o no coincide el ID');
       }
 
       const timelineEvents = await medicalHistoryDetailsService.getMedicalHistoryTimeline(
