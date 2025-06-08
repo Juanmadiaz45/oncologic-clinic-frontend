@@ -23,6 +23,7 @@ import {
   AdministrativeDetailPage,
 } from '@/pages/staff';
 import DoctorDashboard from '@/pages/dashboard/DoctorDashboard';
+import AdministrativeDashboard from '@/pages/dashboard/AdministrativeDashboard';
 import MedicalAppointment from '@/pages/appointments/MedicalAppointment';
 import AdminDashboard from '@/pages/dashboard/AdminDashboard';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
@@ -39,6 +40,7 @@ function App() {
     isAuthenticated,
     isAdmin,
     isDoctor,
+    isAdministrative,
   } = useAuth();
 
   // Initialize auth on app start
@@ -57,8 +59,9 @@ function App() {
       return <AdminDashboard />;
     } else if (isDoctor) {
       return <DoctorDashboard />;
+    } else if (isAdministrative) {
+      return <AdministrativeDashboard />;
     } else {
-      // For other roles, redirect to appropriate page or show default
       return <Navigate to={ROUTES.LOGIN} replace />;
     }
   };
@@ -107,7 +110,7 @@ function App() {
           <Route
             path={ROUTES.DASHBOARD}
             element={
-              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
+              <ProtectedRoute roles={['ADMIN', 'DOCTOR', 'ADMINISTRATIVE']}>
                 {getDashboardComponent()}
               </ProtectedRoute>
             }

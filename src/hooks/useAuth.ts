@@ -101,6 +101,16 @@ export const useAuth = () => {
     [dispatch]
   );
 
+  // Agregar al final del hook useAuth, antes del return:
+  console.log('🔍 Auth Debug:', {
+    currentUser,
+    userRoles,
+    isAdmin,
+    isDoctor,
+    isAdministrative,
+    isAuthenticated
+  });
+
   return {
     // State
     currentUser,
