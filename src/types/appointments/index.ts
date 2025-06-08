@@ -13,4 +13,6 @@ export type {
   CreateTreatmentRequest,
   CreatePrescribedMedicineRequest,
   UpdateTaskStatusRequest,
-} from './medicalAppointmentTypesPage'
+} from './medicalAppointmentTypesPage';
+export * from './medicalOffices';
+export * from './step2Types';

@@ -1,6 +1,5 @@
 // API Endpoints
 export const API_ENDPOINTS = {
-  
   LOGIN: '/auth/login',
   LOGOUT: '/auth/logout',
   FORGOT_PASSWORD: '/auth/forgot-password',
@@ -27,6 +26,13 @@ export const API_ENDPOINTS = {
   APPOINTMENT_TYPES: '/medical-appointment-types',
   MEDICAL_OFFICES: '/medical-offices',
   MEDICAL_TASKS: '/medical-tasks',
+
+  // Step 2 specific endpoints
+  DOCTORS_BY_SPECIALITY: '/doctors/by-speciality',
+  DOCTORS_SEARCH: '/doctors/search',
+  DOCTOR_AVAILABILITIES: '/doctors/:doctorId/availabilities',
+  MEDICAL_OFFICES_AVAILABLE: '/medical-offices/available',
+  SCHEDULE_APPOINTMENT: '/medical-appointments/schedule',
 
   // Medical History
   MEDICAL_HISTORY: '/patients/medical-history',

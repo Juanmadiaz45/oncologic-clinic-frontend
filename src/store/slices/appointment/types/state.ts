@@ -3,6 +3,7 @@ import { Patient } from '@/types';
 import { MedicalTask } from '@/types';
 import { AppointmentType } from '@/types';
 import { MedicalAppointment } from '@/types';
+import { initialStep2Data } from './step2Data';
 
 export interface AppointmentState {
   // Form data
@@ -14,6 +15,13 @@ export interface AppointmentState {
   isLoadingTypes: boolean;
   isCalculatingDuration: boolean;
   isSaving: boolean;
+
+  // Step 2 loading states
+  isSearchingDoctors: boolean;
+  isLoadingDoctors: boolean;
+  isLoadingTimeSlots: boolean;
+  isLoadingOffices: boolean;
+  isCreatingAppointment: boolean;
 
   // Data lists
   searchResults: Patient[];
@@ -30,16 +38,23 @@ export const initialState: AppointmentState = {
   formData: {
     patient: null,
     appointmentTypeId: null,
+    appointmentTypeName: null,
     baseAppointmentId: null,
-    baseDuration: 0, // New property
+    baseDuration: 0,
     duration: 0,
     medicalTasks: [],
+    step2: initialStep2Data,
   },
   currentStep: 1,
   isSearchingPatients: false,
   isLoadingTypes: false,
   isCalculatingDuration: false,
   isSaving: false,
+  isSearchingDoctors: false,
+  isLoadingDoctors: false,
+  isLoadingTimeSlots: false,
+  isLoadingOffices: false,
+  isCreatingAppointment: false,
   searchResults: [],
   appointmentTypes: [],
   baseAppointments: [],
