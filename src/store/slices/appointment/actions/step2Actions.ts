@@ -3,7 +3,7 @@ import { api } from '@/services/api/client';
 import { API_ENDPOINTS } from '@/constants';
 import {
   DoctorResponseDTO,
-  DoctorAvailability,
+  Availability,
   MedicalOffice,
   TimeSlot,
   CreateAppointmentRequest,
@@ -34,12 +34,12 @@ export const getDoctorsBySpeciality = createAsyncThunk(
 );
 
 // Get doctor availabilities
-export const getDoctorAvailabilities = createAsyncThunk(
-  'appointment/getDoctorAvailabilities',
+export const getPersonalAvailabilities = createAsyncThunk(
+  'appointment/getPersonalAvailabilities',
   async (doctorId: number) => {
-    const availabilities = await api.get<DoctorAvailability[]>(
-      API_ENDPOINTS.DOCTOR_AVAILABILITIES.replace(
-        ':doctorId',
+    const availabilities = await api.get<Availability[]>(
+      API_ENDPOINTS.PERSONAL_AVAILABILITIES.replace(
+        ':personalId',
         doctorId.toString()
       )
     );
@@ -47,31 +47,21 @@ export const getDoctorAvailabilities = createAsyncThunk(
   }
 );
 
-// Generate time slots for a specific date
+// Generate time slots for a specific date based on doctor availabilities
 export const generateTimeSlots = createAsyncThunk(
   'appointment/generateTimeSlots',
   async (params: {
-    doctorId: number;
     date: string;
     duration: number;
-    availabilities: DoctorAvailability[];
+    availabilities: Availability[];
   }) => {
-    const { doctorId, date, duration, availabilities } = params;
+    const { date, duration, availabilities } = params;
 
-    // Get existing appointments for the doctor on that date
-    const existingAppointments = await api.get<
-      Array<{
-        startTime: string;
-        endTime: string;
-      }>
-    >(`/medical-appointments/doctor/${doctorId}/date/${date}`);
-
-    // Calculate available time slots based on availabilities and existing appointments
+    // Calculate available time slots based only on doctor availabilities
     const timeSlots = calculateAvailableTimeSlots(
       date,
       duration,
-      availabilities,
-      existingAppointments
+      availabilities
     );
 
     return timeSlots;
@@ -102,60 +92,99 @@ export const createAppointment = createAsyncThunk(
   }
 );
 
-// Helper function to calculate available time slots
+// Helper function to calculate available time slots based on doctor availabilities
 function calculateAvailableTimeSlots(
   date: string,
   durationMinutes: number,
-  availabilities: DoctorAvailability[],
-  existingAppointments: Array<{ startTime: string; endTime: string }>
+  availabilities: Availability[]
 ): TimeSlot[] {
-  const dateObj = new Date(date);
-  const dayOfWeek = dateObj
-    .toLocaleDateString('en-US', { weekday: 'long' })
-    .toUpperCase();
+  // Horario laboral: 6 AM a 8 PM (6:00 - 20:00)
+  const workDayStart = 6 * 60; // 6:00 AM en minutos
+  const workDayEnd = 20 * 60; // 8:00 PM en minutos
 
-  // Find availability for the selected day
-  const dayAvailability = availabilities.find(
-    avail => avail.dayOfWeek === dayOfWeek && avail.status === 'A'
+  // Filtrar availabilities que coincidan con la fecha seleccionada
+  const dayAvailabilities = availabilities.filter(avail =>
+    isDateInRange(date, avail.startTime, avail.endTime)
   );
 
-  if (!dayAvailability) return [];
+  // Crear períodos ocupados basados en las availabilities
+  const occupiedPeriods = dayAvailabilities.map(avail => ({
+    start: parseTime(avail.startTime),
+    end: parseTime(avail.endTime),
+  }));
+
+  // Ordenar y fusionar períodos ocupados superpuestos
+  const mergedOccupiedPeriods = mergeOverlappingPeriods(occupiedPeriods);
 
   const timeSlots: TimeSlot[] = [];
-  const startTime = parseTime(dayAvailability.startTime);
-  const endTime = parseTime(dayAvailability.endTime);
 
-  // Generate 15-minute intervals
+  // Generar slots de 15 minutos en el horario laboral
   for (
-    let current = startTime;
-    current + durationMinutes <= endTime;
+    let current = workDayStart;
+    current + durationMinutes <= workDayEnd;
     current += 15
   ) {
-    const slotStart = formatTime(current);
-    const slotEnd = formatTime(current + durationMinutes);
+    const slotStart = current;
+    const slotEnd = current + durationMinutes;
 
-    // Check if this slot conflicts with existing appointments
-    const hasConflict = existingAppointments.some(appointment => {
-      const appointmentStart = parseTime(appointment.startTime);
-      const appointmentEnd = parseTime(appointment.endTime);
-      return (
-        current < appointmentEnd && current + durationMinutes > appointmentStart
-      );
-    });
+    // Verificar si el slot completo está libre (no se superpone con ningún período ocupado)
+    const isSlotFree = !mergedOccupiedPeriods.some(
+      occupied => slotStart < occupied.end && slotEnd > occupied.start
+    );
 
     timeSlots.push({
-      startTime: slotStart,
-      endTime: slotEnd,
-      available: !hasConflict,
+      startTime: formatTime(slotStart),
+      endTime: formatTime(slotEnd),
+      available: isSlotFree,
     });
   }
 
   return timeSlots;
 }
 
+// Helper function to merge overlapping time periods
+function mergeOverlappingPeriods(
+  periods: Array<{ start: number; end: number }>
+): Array<{ start: number; end: number }> {
+  if (periods.length === 0) return [];
+
+  // Ordenar períodos por hora de inicio
+  const sorted = periods.sort((a, b) => a.start - b.start);
+  const merged = [sorted[0]];
+
+  for (let i = 1; i < sorted.length; i++) {
+    const current = sorted[i];
+    const lastMerged = merged[merged.length - 1];
+
+    // Si el período actual se superpone o toca el último período fusionado
+    if (current.start <= lastMerged.end) {
+      lastMerged.end = Math.max(lastMerged.end, current.end);
+    } else {
+      merged.push(current);
+    }
+  }
+
+  return merged;
+}
+
+// Helper function to check if a date falls within an availability range
+function isDateInRange(
+  date: string,
+  startDateTime: string,
+  endDateTime: string
+): boolean {
+  const targetDate = new Date(date);
+  const startDate = new Date(startDateTime);
+  const endDate = new Date(endDateTime);
+
+  return targetDate >= startDate && targetDate <= endDate;
+}
+
 // Helper functions
 function parseTime(timeStr: string): number {
-  const [hours, minutes] = timeStr.split(':').map(Number);
+  // Si timeStr es un datetime completo, extraer solo la hora
+  const timeOnly = timeStr.includes('T') ? timeStr.split('T')[1] : timeStr;
+  const [hours, minutes] = timeOnly.split(':').map(Number);
   return hours * 60 + minutes;
 }
 

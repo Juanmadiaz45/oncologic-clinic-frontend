@@ -1,6 +1,6 @@
 import {
   DoctorResponseDTO,
-  DoctorAvailability,
+  Availability,
   MedicalOffice,
   TimeSlot,
 } from '@/types';
@@ -16,14 +16,11 @@ export interface AppointmentStep2Data {
   selectedDate: string | null; // 'YYYY-MM-DD'
   selectedTimeSlot: TimeSlot | null;
   availableTimeSlots: TimeSlot[];
-  doctorAvailabilities: DoctorAvailability[];
+  doctorAvailabilities: Availability[];
 
   // Office selection
   selectedOfficeId: number | null;
   availableOffices: MedicalOffice[];
-
-  // Additional
-  notes: string;
 }
 
 export const initialStep2Data: AppointmentStep2Data = {
@@ -37,5 +34,4 @@ export const initialStep2Data: AppointmentStep2Data = {
   doctorAvailabilities: [],
   selectedOfficeId: null,
   availableOffices: [],
-  notes: '',
 };

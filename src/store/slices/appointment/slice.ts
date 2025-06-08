@@ -122,7 +122,7 @@ const appointmentSlice = createSlice({
 
     // Get doctor availabilities
     builder.addCase(
-      step2AsyncActions.getDoctorAvailabilities.fulfilled,
+      step2AsyncActions.getPersonalAvailabilities.fulfilled,
       (state, action) => {
         state.formData.step2.doctorAvailabilities = action.payload;
       }

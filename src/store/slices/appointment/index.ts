@@ -24,7 +24,6 @@ export const {
   setSelectedDate,
   selectTimeSlot,
   setSelectedOffice,
-  setNotes,
   clearStep2Data,
 } = appointmentSlice.actions;
 

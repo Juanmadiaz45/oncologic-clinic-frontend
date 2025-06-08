@@ -30,7 +30,7 @@ export const API_ENDPOINTS = {
   // Step 2 specific endpoints
   DOCTORS_BY_SPECIALITY: '/doctors/by-speciality',
   DOCTORS_SEARCH: '/doctors/search',
-  DOCTOR_AVAILABILITIES: '/doctors/:doctorId/availabilities',
+  PERSONAL_AVAILABILITIES: '/personal/:personalId/availabilities',
   MEDICAL_OFFICES_AVAILABLE: '/medical-offices/available',
   SCHEDULE_APPOINTMENT: '/medical-appointments/schedule',
 

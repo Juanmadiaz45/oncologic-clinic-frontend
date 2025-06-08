@@ -9,7 +9,6 @@ import {
   setSelectedDate,
   selectTimeSlot,
   setSelectedOffice,
-  setNotes,
   setError,
 } from '@/store/slices/appointment';
 import { DoctorResponseDTO, TimeSlot, CreateAppointmentRequest } from '@/types';
@@ -54,7 +53,9 @@ export const useAppointmentStep2 = () => {
     async (doctor: DoctorResponseDTO) => {
       dispatch(selectDoctor(doctor));
       // Load doctor availabilities
-      await dispatch(step2Actions.getDoctorAvailabilities(doctor.id));
+      await dispatch(
+        step2Actions.getPersonalAvailabilities(doctor.personalData.id)
+      );
     },
     [dispatch]
   );
@@ -70,7 +71,6 @@ export const useAppointmentStep2 = () => {
         // Generate time slots for the selected date
         await dispatch(
           step2Actions.generateTimeSlots({
-            doctorId: step2Data.selectedDoctor.id,
             date,
             duration: formData.duration,
             availabilities: step2Data.doctorAvailabilities,
@@ -111,13 +111,6 @@ export const useAppointmentStep2 = () => {
     [dispatch]
   );
 
-  const handleSetNotes = useCallback(
-    (notes: string) => {
-      dispatch(setNotes(notes));
-    },
-    [dispatch]
-  );
-
   const handleCreateAppointment = useCallback(async () => {
     const isFormValid = !!(
       step2Data.selectedDoctor &&
@@ -130,13 +123,13 @@ export const useAppointmentStep2 = () => {
 
     const appointmentData: CreateAppointmentRequest = {
       doctorId: step2Data.selectedDoctor!.id,
-      patientId: formData.patient!.id,
       typeOfMedicalAppointmentId: formData.appointmentTypeId!,
       appointmentDate: `${step2Data.selectedDate}T${
         step2Data.selectedTimeSlot!.startTime
       }:00`,
+      medicalHistoryId: formData.patient!.medicalHistory?.id,
       medicalOfficeId: step2Data.selectedOfficeId!,
-      notes: step2Data.notes || undefined,
+      medicalTaskIds: [],
     };
 
     await dispatch(step2Actions.createAppointment(appointmentData));
@@ -180,7 +173,6 @@ export const useAppointmentStep2 = () => {
     setSelectedDate: handleSetSelectedDate,
     selectTimeSlot: handleSelectTimeSlot,
     setSelectedOffice: handleSetSelectedOffice,
-    setNotes: handleSetNotes,
     createAppointment: handleCreateAppointment,
     setError: handleSetError,
 

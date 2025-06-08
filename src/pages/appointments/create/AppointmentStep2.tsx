@@ -7,7 +7,6 @@ import { DateTimeSelector } from '@/components/appointments/DateTimeSelector';
 import { OfficeSelector } from '@/components/appointments/OfficeSelector';
 import Alert from '@/components/ui/Alert';
 import Button from '@/components/ui/Button';
-import { Textarea } from '@/components/ui';
 import { useAppointmentSteps } from '@/hooks/useAppointmentSteps';
 import { useAppointmentStep2 } from '@/hooks/useAppointmentStep2';
 import { ROUTES } from '@/constants';
@@ -38,7 +37,6 @@ const AppointmentStep2: React.FC = () => {
     setSelectedDate,
     selectTimeSlot,
     setSelectedOffice,
-    setNotes,
     createAppointment,
     setError,
 
@@ -135,7 +133,6 @@ const AppointmentStep2: React.FC = () => {
             />
           </div>
         )}
-
         {/* Patient Summary */}
         <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <h3 className="text-sm font-medium text-gray-500 mb-2">
@@ -159,7 +156,6 @@ const AppointmentStep2: React.FC = () => {
             </div>
           </div>
         </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column - Doctor Selection */}
           <CardContainer>
@@ -206,32 +202,8 @@ const AppointmentStep2: React.FC = () => {
             )}
           </div>
         </div>
-
-        {/* Notes Section */}
-        {step2Data.selectedDoctor && (
-          <div className="mt-6">
-            <CardContainer>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Notas Adicionales (Opcional)
-                </h3>
-                <Textarea
-                  value={step2Data.notes}
-                  onChange={e => setNotes(e.target.value)}
-                  placeholder="Agregue cualquier información adicional sobre la cita..."
-                  rows={3}
-                />
-              </div>
-            </CardContainer>
-          </div>
-        )}
-
         {/* Action Buttons */}
-        <div className="mt-8 flex justify-between items-center">
-          <Button onClick={handleBack} variant="secondary" size="lg">
-            ← Anterior
-          </Button>
-
+        <div className="mt-8 flex justify-end items-center">
           <div className="flex items-center space-x-4">
             {!isFormValid && (
               <p className="text-sm text-gray-500">

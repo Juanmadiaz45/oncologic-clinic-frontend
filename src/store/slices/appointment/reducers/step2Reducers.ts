@@ -61,11 +61,6 @@ export const step2Reducers = {
     state.formData.step2.selectedOfficeId = action.payload;
   },
 
-  // Notes
-  setNotes: (state: AppointmentState, action: PayloadAction<string>) => {
-    state.formData.step2.notes = action.payload;
-  },
-
   // Clear step 2 data
   clearStep2Data: (state: AppointmentState) => {
     state.formData.step2 = {
@@ -79,7 +74,6 @@ export const step2Reducers = {
       doctorAvailabilities: [],
       selectedOfficeId: null,
       availableOffices: [],
-      notes: '',
     };
   },
 };

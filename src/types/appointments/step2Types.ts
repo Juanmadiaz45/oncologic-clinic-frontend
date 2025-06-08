@@ -12,12 +12,16 @@ export interface Doctor extends BaseEntity {
   specialityNames?: string[];
 }
 
-export interface DoctorAvailability extends BaseEntity {
-  doctorId: number;
-  dayOfWeek: string; // 'MONDAY', 'TUESDAY', etc.
+export interface Availability extends BaseEntity {
   startTime: string; // 'HH:mm'
   endTime: string; // 'HH:mm'
-  status: 'A' | 'I';
+  personalIds: number[];
+  status: Status;
+}
+
+export interface Status extends BaseEntity {
+  name: string; // e.g., 'PENDING', 'CONFIRMED', 'CANCELLED'
+  availabilityIds?: number[];
 }
 
 export interface TimeSlot {

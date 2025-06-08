@@ -11,9 +11,10 @@ export interface MedicalAppointment {
 
 export interface CreateAppointmentRequest {
   doctorId: number;
-  patientId: number;
   typeOfMedicalAppointmentId: number;
   appointmentDate: string; // 'YYYY-MM-DDTHH:mm:ss'
+  treatmentId?: number | null; // Optional for initial creation
+  medicalHistoryId?: number;
   medicalOfficeId: number;
-  notes?: string;
+  medicalTaskIds: number[];
 }
