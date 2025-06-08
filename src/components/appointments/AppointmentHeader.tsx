@@ -116,7 +116,6 @@ export const AppointmentHeader: React.FC<AppointmentHeaderProps> = ({
     if (onBack) {
       onBack();
     }
-    // If there is no onBack function, the parent should handle the navigation
   };
 
   const steps = [
@@ -171,8 +170,8 @@ export const AppointmentHeader: React.FC<AppointmentHeaderProps> = ({
               </div>
             </div>
 
-            {/* Progress bar with steps */}
-            <div className="flex items-center justify-center">
+            {/* Progress bar with steps - Only show on medium and large screens*/}
+            <div className="hidden md:flex items-center justify-center">
               <div className="flex items-center w-full max-w-2xl">
                 {steps.map((stepInfo, index) => (
                   <ProgressStep
@@ -187,7 +186,18 @@ export const AppointmentHeader: React.FC<AppointmentHeaderProps> = ({
               </div>
             </div>
 
-            <UserDropdown />
+            {/* Simple indicator for mobile */}
+            <div className="md:hidden flex items-center space-x-2">
+              <span className="text-sm text-gray-500">
+                Paso {currentStep} de {totalSteps}
+              </span>
+              <UserDropdown />
+            </div>
+
+            {/* UserDropdown only on desktop */}
+            <div className="hidden md:block">
+              <UserDropdown />
+            </div>
           </div>
         </div>
       </div>

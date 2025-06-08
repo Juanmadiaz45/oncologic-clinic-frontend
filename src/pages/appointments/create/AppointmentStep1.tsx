@@ -33,7 +33,8 @@ const AppointmentStep1: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const isFormValid = !!(formData.patient && formData.appointmentTypeId);
-  const { nextStep } = useAppointmentSteps(1, isFormValid);
+
+  const { nextStep, prevStep, canGoNext } = useAppointmentSteps(1, isFormValid);
 
   useEffect(() => {
     loadAppointmentTypes();
@@ -60,13 +61,25 @@ const AppointmentStep1: React.FC = () => {
     clearSearchResults();
   };
 
+  const handleNext = () => {
+    if (canGoNext) {
+      nextStep();
+    }
+  };
+
+  const handleBack = () => {
+    prevStep();
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <AppointmentHeader
         title="Agendar Cita Médica"
-        step="Seleccionar paciente"
+        step="Seleccionar paciente y tipo de cita"
         currentStep={1}
         totalSteps={2}
+        onBack={handleBack}
+        showBackButton={true}
       />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -82,6 +95,7 @@ const AppointmentStep1: React.FC = () => {
           )}
 
           <div className="space-y-6">
+            {/* Patient search */}
             <PatientSearchInput
               searchTerm={searchTerm}
               searchResults={searchResults}
@@ -91,6 +105,7 @@ const AppointmentStep1: React.FC = () => {
               onPatientSelect={handlePatientSelect}
             />
 
+            {/* Appointment type selector */}
             <AppointmentTypeSelector
               appointmentTypes={appointmentTypes}
               selectedTypeId={formData.appointmentTypeId}
@@ -98,6 +113,7 @@ const AppointmentStep1: React.FC = () => {
               onChange={selectAppointmentType}
             />
 
+            {/* Show duration if available */}
             {formData.duration > 0 && (
               <DurationDisplay
                 duration={formData.duration}
@@ -105,21 +121,31 @@ const AppointmentStep1: React.FC = () => {
               />
             )}
 
+            {/* Medical To-Do List */}
             <TasksList
               tasks={formData.medicalTasks}
               selectedTypeId={formData.appointmentTypeId}
               totalDuration={formData.duration}
             />
 
-            <div className="flex justify-end pt-4">
-              <Button
-                onClick={nextStep}
-                disabled={!isFormValid}
-                size="lg"
-                className="min-w-[120px]"
-              >
-                Siguiente →
-              </Button>
+            {/* Navigation buttons */}
+            <div className="flex justify-end pt-6">
+              <div className="flex items-center space-x-4">
+                {!isFormValid && (
+                  <p className="text-sm text-gray-500">
+                    Seleccione un paciente y tipo de cita para continuar
+                  </p>
+                )}
+                <Button
+                  onClick={handleNext}
+                  disabled={!canGoNext}
+                  variant="primary"
+                  size="lg"
+                  className="min-w-[120px]"
+                >
+                  Siguiente →
+                </Button>
+              </div>
             </div>
           </div>
         </CardContainer>
