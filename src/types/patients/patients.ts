@@ -13,5 +13,5 @@ export interface Patient extends BaseEntity {
   address: string;
   phoneNumber: string;
   email: string;
-  medicalHistory?: MedicalHistory;
+  medicalHistory: MedicalHistory;
 }

@@ -127,7 +127,7 @@ export const useAppointmentStep2 = () => {
       appointmentDate: `${step2Data.selectedDate}T${
         step2Data.selectedTimeSlot!.startTime
       }:00`,
-      medicalHistoryId: formData.patient!.medicalHistory?.id,
+      medicalHistoryId: formData.patient!.medicalHistory.id!,
       medicalOfficeId: step2Data.selectedOfficeId!,
       medicalTaskIds: [],
     };

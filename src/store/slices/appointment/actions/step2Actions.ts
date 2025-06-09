@@ -85,7 +85,7 @@ export const createAppointment = createAsyncThunk(
   'appointment/createAppointment',
   async (appointmentData: CreateAppointmentRequest) => {
     const response = await api.post(
-      API_ENDPOINTS.SCHEDULE_APPOINTMENT,
+      API_ENDPOINTS.MEDICAL_APPOINTMENTS,
       appointmentData
     );
     return response;
