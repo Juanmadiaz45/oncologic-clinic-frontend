@@ -110,7 +110,7 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
                       <span>{timeSlot.startTime}</span>
                     </div>
                     <div className="text-xs mt-1">
-                      {timeSlot.available ? 'Disponible' : 'Ocupado'}
+                      {timeSlot.available ? 'Disponible' : 'No disponible'}
                     </div>
                   </button>
                 ))}

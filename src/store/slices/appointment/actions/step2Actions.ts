@@ -17,10 +17,7 @@ import {
 export const searchDoctors = createAsyncThunk(
   'appointment/searchDoctors',
   async (searchTerm: string) => {
-    // If the term is empty, return empty array immediately
-    if (!searchTerm.trim()) {
-      return [];
-    }
+    if (!searchTerm.trim()) return [];
 
     const doctors = await api.get<DoctorResponseDTO[]>(
       `${API_ENDPOINTS.DOCTORS_SEARCH}?name=${encodeURIComponent(searchTerm)}`
@@ -64,7 +61,7 @@ export const generateTimeSlots = createAsyncThunk(
   }) => {
     const { date, duration, availabilities } = params;
 
-    // Calculate available time slots based only on doctor availabilities
+    // Calculate available time slots based on doctor availabilities
     const timeSlots = calculateAvailableTimeSlots(
       date,
       duration,
@@ -99,7 +96,7 @@ export const createAppointment = createAsyncThunk(
   }
 );
 
-// Create medical tasks for the appointment
+// Crear tareas médicas para la cita
 export const createMedicalTasksForAppointment = createAsyncThunk(
   'appointment/createMedicalTasksForAppointment',
   async (tasks: CreateMedicalTaskRequest[]) => {
@@ -167,7 +164,7 @@ export const createAppointmentWithTasks = createAsyncThunk(
       '🔍 Creando cita médica con datos finales:',
       finalAppointmentData
     );
-    const appointmentResponse = await api.post(
+    const response = await api.post(
       API_ENDPOINTS.MEDICAL_APPOINTMENTS,
       finalAppointmentData
     );
@@ -180,7 +177,7 @@ export const createAppointmentWithTasks = createAsyncThunk(
     );
 
     return {
-      appointment: appointmentResponse,
+      appointment: response,
       createdTasks: [...createdTemplateTasks, ...createdCustomTasks],
     };
   }
@@ -192,65 +189,162 @@ function calculateAvailableTimeSlots(
   durationMinutes: number,
   availabilities: Availability[]
 ): TimeSlot[] {
-  // Horario laboral: 6 AM a 8 PM (6:00 - 20:00)
-  const workDayStart = 6 * 60; // 6:00 AM en minutos
-  const workDayEnd = 20 * 60; // 8:00 PM en minutos
+  // Working hours: 6 AM to 8 PM (6:00 - 20:00)
+  const workDayStart = 6 * 60; // 6:00 AM
+  const workDayEnd = 20 * 60; // 8:00 PM
+  const slotInterval = 15; // 15-minute intervals
 
-  // Filtrar availabilities que coincidan con la fecha seleccionada
+  console.log(
+    `🔍 Calculando disponibilidad para ${date} (duración: ${durationMinutes} min)`
+  );
+  console.log(`📋 Availabilities del doctor:`, availabilities);
+
+  // Filter availabilities that match the selected date
   const dayAvailabilities = availabilities.filter(avail =>
-    isDateInRange(date, avail.startTime, avail.endTime)
+    isDateInAvailabilityRange(date, avail.startTime, avail.endTime)
   );
 
-  // Crear períodos ocupados basados en las availabilities
-  const occupiedPeriods = dayAvailabilities.map(avail => ({
-    start: parseTime(avail.startTime),
-    end: parseTime(avail.endTime),
-  }));
+  console.log(`📅 Availabilities para ${date}:`, dayAvailabilities);
 
-  // Ordenar y fusionar períodos ocupados superpuestos
+  // Create BUSY periods based on availabilities
+  const occupiedPeriods = dayAvailabilities.map(avail => {
+    const start = extractTimeFromDateTime(avail.startTime);
+    const end = extractTimeFromDateTime(avail.endTime);
+
+    console.log(
+      `⏰ Período ocupado: ${formatTime(start)} - ${formatTime(end)}`
+    );
+
+    return {
+      start,
+      end,
+    };
+  });
+
+  // Sort and merge overlapping busy periods
   const mergedOccupiedPeriods = mergeOverlappingPeriods(occupiedPeriods);
+  console.log(
+    `🔗 Períodos ocupados fusionados:`,
+    mergedOccupiedPeriods.map(
+      p => `${formatTime(p.start)} - ${formatTime(p.end)}`
+    )
+  );
+
+  // Calculate FREE periods among those employed
+  const freePeriods = calculateFreePeriods(
+    workDayStart,
+    workDayEnd,
+    mergedOccupiedPeriods
+  );
+  console.log(
+    `✅ Períodos libres:`,
+    freePeriods.map(
+      p =>
+        `${formatTime(p.start)} - ${formatTime(p.end)} (${p.end - p.start} min)`
+    )
+  );
 
   const timeSlots: TimeSlot[] = [];
 
-  // Generar slots de 15 minutos en el horario laboral
+  // Generate slots for the entire working schedule in 15-minute intervals
   for (
     let current = workDayStart;
     current + durationMinutes <= workDayEnd;
-    current += 15
+    current += slotInterval
   ) {
     const slotStart = current;
     const slotEnd = current + durationMinutes;
 
-    // Verificar si el slot completo está libre (no se superpone con ningún período ocupado)
-    const isSlotFree = !mergedOccupiedPeriods.some(
-      occupied => slotStart < occupied.end && slotEnd > occupied.start
-    );
+    // Check if the full slot fits into any free period
+    const isSlotAvailable = freePeriods.some(freePeriod => {
+      const fitsInFreePeriod =
+        slotStart >= freePeriod.start && slotEnd <= freePeriod.end;
+
+      if (fitsInFreePeriod) {
+        console.log(
+          `✅ Slot ${formatTime(slotStart)}-${formatTime(
+            slotEnd
+          )} cabe en período libre ${formatTime(freePeriod.start)}-${formatTime(
+            freePeriod.end
+          )}`
+        );
+      }
+
+      return fitsInFreePeriod;
+    });
 
     timeSlots.push({
       startTime: formatTime(slotStart),
       endTime: formatTime(slotEnd),
-      available: isSlotFree,
+      available: isSlotAvailable,
     });
   }
+
+  const availableCount = timeSlots.filter(slot => slot.available).length;
+  console.log(
+    `📊 Generados ${timeSlots.length} slots totales, ${availableCount} disponibles`
+  );
 
   return timeSlots;
 }
 
-// Helper function to merge overlapping time periods
+// New function to calculate free periods between busy periods
+function calculateFreePeriods(
+  workStart: number,
+  workEnd: number,
+  occupiedPeriods: Array<{ start: number; end: number }>
+): Array<{ start: number; end: number }> {
+  const freePeriods: Array<{ start: number; end: number }> = [];
+
+  if (occupiedPeriods.length === 0) {
+    // If there are no busy periods, the whole day is free
+    return [{ start: workStart, end: workEnd }];
+  }
+
+  // Sort busy periods by start time
+  const sortedOccupied = [...occupiedPeriods].sort((a, b) => a.start - b.start);
+
+  let currentStart = workStart;
+
+  for (const occupied of sortedOccupied) {
+    // If there is free space before the occupied period
+    if (currentStart < occupied.start) {
+      freePeriods.push({
+        start: currentStart,
+        end: occupied.start,
+      });
+    }
+
+    // Move the start to the end of the busy period
+    currentStart = Math.max(currentStart, occupied.end);
+  }
+
+  // If there is free time after the last busy period
+  if (currentStart < workEnd) {
+    freePeriods.push({
+      start: currentStart,
+      end: workEnd,
+    });
+  }
+
+  return freePeriods;
+}
+
+// Improved Helper function to merge overlapping periods
 function mergeOverlappingPeriods(
   periods: Array<{ start: number; end: number }>
 ): Array<{ start: number; end: number }> {
   if (periods.length === 0) return [];
 
-  // Ordenar períodos por hora de inicio
-  const sorted = periods.sort((a, b) => a.start - b.start);
+  // Sort periods by start time
+  const sorted = [...periods].sort((a, b) => a.start - b.start);
   const merged = [sorted[0]];
 
   for (let i = 1; i < sorted.length; i++) {
     const current = sorted[i];
     const lastMerged = merged[merged.length - 1];
 
-    // Si el período actual se superpone o toca el último período fusionado
+    // If the current period overlaps or touches the last merged period
     if (current.start <= lastMerged.end) {
       lastMerged.end = Math.max(lastMerged.end, current.end);
     } else {
@@ -261,27 +355,43 @@ function mergeOverlappingPeriods(
   return merged;
 }
 
-// Helper function to check if a date falls within an availability range
-function isDateInRange(
-  date: string,
+// Improved helper function to check if a date is within the availability range
+function isDateInAvailabilityRange(
+  targetDate: string,
   startDateTime: string,
   endDateTime: string
 ): boolean {
-  const targetDate = new Date(date);
-  const startDate = new Date(startDateTime);
-  const endDate = new Date(endDateTime);
+  const target = new Date(targetDate + 'T00:00:00');
+  const start = new Date(startDateTime);
+  const end = new Date(endDateTime);
 
-  return targetDate >= startDate && targetDate <= endDate;
+  // Normalize to only dates (no times) for comparison
+  const targetDateOnly = new Date(
+    target.getFullYear(),
+    target.getMonth(),
+    target.getDate()
+  );
+  const startDateOnly = new Date(
+    start.getFullYear(),
+    start.getMonth(),
+    start.getDate()
+  );
+  const endDateOnly = new Date(
+    end.getFullYear(),
+    end.getMonth(),
+    end.getDate()
+  );
+
+  return targetDateOnly >= startDateOnly && targetDateOnly <= endDateOnly;
 }
 
-// Helper functions
-function parseTime(timeStr: string): number {
-  // Si timeStr es un datetime completo, extraer solo la hora
-  const timeOnly = timeStr.includes('T') ? timeStr.split('T')[1] : timeStr;
-  const [hours, minutes] = timeOnly.split(':').map(Number);
-  return hours * 60 + minutes;
+// Helper function to extract only the time from a datetime
+function extractTimeFromDateTime(dateTimeStr: string): number {
+  const date = new Date(dateTimeStr);
+  return date.getHours() * 60 + date.getMinutes();
 }
 
+// Helper function unchanged
 function formatTime(minutes: number): string {
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
