@@ -129,10 +129,17 @@ export const useAppointmentStep2 = () => {
       }:00`,
       medicalHistoryId: formData.patient!.medicalHistory.id!,
       medicalOfficeId: step2Data.selectedOfficeId!,
-      medicalTaskIds: [],
+      medicalTaskIds: [], // It will be filled automatically when creating tasks
     };
 
-    await dispatch(step2Actions.createAppointment(appointmentData));
+    // Use the new action that creates the tasks first and then the appointment
+    await dispatch(
+      step2Actions.createAppointmentWithTasks({
+        appointmentData,
+        templateTasks: formData.medicalTasks,
+        customTasks: formData.customMedicalTasks,
+      })
+    );
   }, [dispatch, step2Data, formData, isCreatingAppointment]);
 
   const handleSetError = useCallback(

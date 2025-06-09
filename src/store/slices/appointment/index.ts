@@ -12,6 +12,9 @@ export const {
   clearSearchResults,
   addMedicalTask,
   removeMedicalTask,
+  addCustomMedicalTask, // Nuevo
+  removeCustomMedicalTask, // Nuevo
+  updateCustomMedicalTask, // Nuevo
   resetForm,
   setError,
   setValidationErrors,

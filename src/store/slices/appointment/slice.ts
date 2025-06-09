@@ -180,6 +180,51 @@ const appointmentSlice = createSlice({
           state.error = action.error.message || 'Error creating appointment';
         }
       );
+
+    builder
+      .addCase(
+        step2AsyncActions.createMedicalTasksForAppointment.pending,
+        state => {
+          state.isCreatingAppointment = true;
+        }
+      )
+      .addCase(
+        step2AsyncActions.createMedicalTasksForAppointment.fulfilled,
+        () => {
+          // We don't need to do anything special here, just continue.
+        }
+      )
+      .addCase(
+        step2AsyncActions.createMedicalTasksForAppointment.rejected,
+        (state, action) => {
+          state.isCreatingAppointment = false;
+          state.error = action.error.message || 'Error creating medical tasks';
+        }
+      );
+
+    // Create appointment with tasks
+    builder
+      .addCase(step2AsyncActions.createAppointmentWithTasks.pending, state => {
+        state.isCreatingAppointment = true;
+      })
+      .addCase(
+        step2AsyncActions.createAppointmentWithTasks.fulfilled,
+        state => {
+          state.isCreatingAppointment = false;
+          // Reset form after successful creation
+          state.formData = initialState.formData;
+          state.currentStep = 1;
+          state.error = null;
+        }
+      )
+      .addCase(
+        step2AsyncActions.createAppointmentWithTasks.rejected,
+        (state, action) => {
+          state.isCreatingAppointment = false;
+          state.error =
+            action.error.message || 'Error creating appointment with tasks';
+        }
+      );
   },
 });
 

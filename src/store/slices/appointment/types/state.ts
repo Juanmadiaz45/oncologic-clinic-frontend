@@ -43,6 +43,7 @@ export const initialState: AppointmentState = {
     baseDuration: 0,
     duration: 0,
     medicalTasks: [],
+    customMedicalTasks: [],
     step2: initialStep2Data,
   },
   currentStep: 1,

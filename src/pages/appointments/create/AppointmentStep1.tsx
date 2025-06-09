@@ -29,6 +29,9 @@ const AppointmentStep1: React.FC = () => {
     calculateDuration,
     clearSearchResults,
     setError,
+    addCustomMedicalTask,
+    removeCustomMedicalTask,
+    updateCustomMedicalTask,
   } = useAppointments();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -124,8 +127,12 @@ const AppointmentStep1: React.FC = () => {
             {/* Medical To-Do List */}
             <TasksList
               tasks={formData.medicalTasks}
+              customTasks={formData.customMedicalTasks}
               selectedTypeId={formData.appointmentTypeId}
               totalDuration={formData.duration}
+              onAddCustomTask={addCustomMedicalTask}
+              onRemoveCustomTask={removeCustomMedicalTask}
+              onUpdateCustomTask={updateCustomMedicalTask}
             />
 
             {/* Navigation buttons */}
