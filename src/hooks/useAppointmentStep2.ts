@@ -34,7 +34,12 @@ export const useAppointmentStep2 = () => {
   const searchDoctors = useCallback(
     (searchTerm: string) => {
       dispatch(setDoctorSearchTerm(searchTerm));
-      if (searchTerm.trim()) {
+
+      // If the term is empty, clear the results
+      if (searchTerm.trim() === '') {
+        // Clear the list of available doctors
+        dispatch(step2Actions.searchDoctors('')); // This should return empty array
+      } else {
         dispatch(step2Actions.searchDoctors(searchTerm));
       }
     },
@@ -131,13 +136,13 @@ export const useAppointmentStep2 = () => {
       medicalOfficeId: step2Data.selectedOfficeId!,
       medicalTaskIds: [], // It will be filled automatically when creating tasks
     };
-
     // Use the new action that creates the tasks first and then the appointment
     await dispatch(
       step2Actions.createAppointmentWithTasks({
         appointmentData,
         templateTasks: formData.medicalTasks,
         customTasks: formData.customMedicalTasks,
+        appointmentDuration: formData.duration,
       })
     );
   }, [dispatch, step2Data, formData, isCreatingAppointment]);

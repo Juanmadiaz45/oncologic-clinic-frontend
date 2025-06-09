@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '@/services/api/client';
 import medicalTaskService from '@/services/api/medicalTaskService';
+import availabilityService from '@/services/api/availabilityService';
 import { API_ENDPOINTS } from '@/constants';
 import {
   DoctorResponseDTO,
@@ -16,7 +17,10 @@ import {
 export const searchDoctors = createAsyncThunk(
   'appointment/searchDoctors',
   async (searchTerm: string) => {
-    if (!searchTerm.trim()) return [];
+    // If the term is empty, return empty array immediately
+    if (!searchTerm.trim()) {
+      return [];
+    }
 
     const doctors = await api.get<DoctorResponseDTO[]>(
       `${API_ENDPOINTS.DOCTORS_SEARCH}?name=${encodeURIComponent(searchTerm)}`
@@ -95,7 +99,7 @@ export const createAppointment = createAsyncThunk(
   }
 );
 
-// Crear tareas médicas para la cita
+// Create medical tasks for the appointment
 export const createMedicalTasksForAppointment = createAsyncThunk(
   'appointment/createMedicalTasksForAppointment',
   async (tasks: CreateMedicalTaskRequest[]) => {
@@ -108,17 +112,19 @@ export const createMedicalTasksForAppointment = createAsyncThunk(
   }
 );
 
-// Crear la cita médica con las tareas ya creadas
+// Create the medical appointment with the tasks already created
 export const createAppointmentWithTasks = createAsyncThunk(
   'appointment/createAppointmentWithTasks',
   async (params: {
     appointmentData: CreateAppointmentRequest;
     templateTasks: MedicalTask[];
     customTasks: CreateMedicalTaskRequest[];
+    appointmentDuration: number;
   }) => {
-    const { appointmentData, templateTasks, customTasks } = params;
+    const { appointmentData, templateTasks, customTasks, appointmentDuration } =
+      params;
 
-    // 1. Crear tareas médicas personalizadas (si las hay)
+    // 1. Create custom medical tasks (if any)
     let createdCustomTasks: MedicalTask[] = [];
     if (customTasks.length > 0) {
       createdCustomTasks = await medicalTaskService.createMedicalTasks(
@@ -126,7 +132,7 @@ export const createAppointmentWithTasks = createAsyncThunk(
       );
     }
 
-    // 2. Crear tareas médicas basadas en las plantillas
+    // 2. Create medical tasks based on templates
     const templateTasksToCreate: CreateMedicalTaskRequest[] = templateTasks.map(
       task => ({
         description: task.description,
@@ -143,7 +149,7 @@ export const createAppointmentWithTasks = createAsyncThunk(
       );
     }
 
-    // 3. Combinar todos los IDs de tareas creadas
+    // 3. Merge all created task IDs
     const allTaskIds = [
       ...createdTemplateTasks.map(task => task.id),
       ...createdCustomTasks.map(task => task.id),
@@ -151,7 +157,7 @@ export const createAppointmentWithTasks = createAsyncThunk(
 
     console.log('🔍 IDs de tareas para vincular a la cita:', allTaskIds);
 
-    // 4. Crear la cita médica con los IDs de las tareas
+    // 4. Create the medical appointment with the task IDs
     const finalAppointmentData = {
       ...appointmentData,
       medicalTaskIds: allTaskIds,
@@ -161,13 +167,20 @@ export const createAppointmentWithTasks = createAsyncThunk(
       '🔍 Creando cita médica con datos finales:',
       finalAppointmentData
     );
-    const response = await api.post(
+    const appointmentResponse = await api.post(
       API_ENDPOINTS.MEDICAL_APPOINTMENTS,
       finalAppointmentData
     );
 
+    // 5. Create availability to mark the doctor as busy
+    await availabilityService.createDoctorBusyAvailability(
+      appointmentData.doctorId,
+      appointmentData.appointmentDate,
+      appointmentDuration
+    );
+
     return {
-      appointment: response,
+      appointment: appointmentResponse,
       createdTasks: [...createdTemplateTasks, ...createdCustomTasks],
     };
   }
