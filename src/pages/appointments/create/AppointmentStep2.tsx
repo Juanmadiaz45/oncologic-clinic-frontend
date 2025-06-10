@@ -5,10 +5,12 @@ import { CardContainer } from '@/components/ui/CardContainer';
 import { DoctorSearch } from '@/components/appointments/DoctorSearch';
 import { DateTimeSelector } from '@/components/appointments/DateTimeSelector';
 import { OfficeSelector } from '@/components/appointments/OfficeSelector';
+import AppointmentSuccessModal from '@/components/appointments/AppointmentSuccessModal';
 import Alert from '@/components/ui/Alert';
 import Button from '@/components/ui/Button';
 import { useAppointmentSteps } from '@/hooks/useAppointmentSteps';
 import { useAppointmentStep2 } from '@/hooks/useAppointmentStep2';
+import { useAppointments } from '@/hooks/useAppointments'; // Para el reset manual
 import { ROUTES } from '@/constants';
 import { formatDateForDisplay } from '@/utils/dateUtils';
 
@@ -16,6 +18,11 @@ const AppointmentStep2: React.FC = () => {
   const navigate = useNavigate();
   const { prevStep } = useAppointmentSteps(2, true);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [wasCreatingAppointment, setWasCreatingAppointment] = useState(false);
+
+  // Para el reset manual
+  const { resetForm } = useAppointments();
 
   const {
     // Form data
@@ -53,6 +60,21 @@ const AppointmentStep2: React.FC = () => {
     }
   }, [formData.patient, formData.appointmentTypeId, navigate]);
 
+  // Detectar cuando la cita se creó exitosamente
+  useEffect(() => {
+    // Si estaba creando y ahora ya no está creando, y no hay error
+    if (wasCreatingAppointment && !isCreatingAppointment && !error) {
+      console.log('✅ Cita creada exitosamente, mostrando modal de éxito');
+      setShowConfirmModal(false);
+      setShowSuccessModal(true);
+    }
+  }, [wasCreatingAppointment, isCreatingAppointment, error]);
+
+  // Trackear el estado de creación
+  useEffect(() => {
+    setWasCreatingAppointment(isCreatingAppointment);
+  }, [isCreatingAppointment]);
+
   const handleBack = () => {
     prevStep();
   };
@@ -77,17 +99,23 @@ const AppointmentStep2: React.FC = () => {
 
   const handleConfirmCreate = async () => {
     try {
+      console.log('🔄 Iniciando creación de cita...');
       await createAppointment();
-      setShowConfirmModal(false);
-      navigate(ROUTES.DASHBOARD);
+      console.log('✅ Llamada a createAppointment completada');
     } catch (error) {
-      console.error('Error creating appointment:', error);
+      console.error('❌ Error creating appointment:', error);
       setShowConfirmModal(false);
     }
   };
 
   const handleCancelCreate = () => {
     setShowConfirmModal(false);
+  };
+
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+    resetForm();
+    navigate(ROUTES.DASHBOARD);
   };
 
   if (!formData.patient || !formData.appointmentTypeId) {
@@ -111,6 +139,22 @@ const AppointmentStep2: React.FC = () => {
     );
   }
 
+  // Preparar datos para el modal de éxito
+  const appointmentDataForModal = {
+    patientName: formData.patient?.name || '',
+    doctorName: step2Data.selectedDoctor
+      ? `Dr. ${step2Data.selectedDoctor.personalData.name} ${step2Data.selectedDoctor.personalData.lastName}`
+      : '',
+    date: step2Data.selectedDate || '',
+    time: step2Data.selectedTimeSlot
+      ? `${step2Data.selectedTimeSlot.startTime} - ${step2Data.selectedTimeSlot.endTime}`
+      : '',
+    office:
+      step2Data.availableOffices.find(o => o.id === step2Data.selectedOfficeId)
+        ?.name || '',
+    duration: formData.duration,
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <AppointmentHeader
@@ -132,6 +176,7 @@ const AppointmentStep2: React.FC = () => {
             />
           </div>
         )}
+
         {/* Patient Summary */}
         <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <h3 className="text-sm font-medium text-gray-500 mb-2">
@@ -140,7 +185,7 @@ const AppointmentStep2: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
               <span className="font-medium text-gray-900">Paciente:</span>{' '}
-              <span className="text-gray-700">{formData.patient.name}</span>
+              <span className="text-gray-700">{formData.patient?.name}</span>
             </div>
             <div>
               <span className="font-medium text-gray-900">Duración:</span>{' '}
@@ -148,6 +193,7 @@ const AppointmentStep2: React.FC = () => {
             </div>
           </div>
         </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column - Doctor Selection */}
           <CardContainer>
@@ -194,6 +240,7 @@ const AppointmentStep2: React.FC = () => {
             )}
           </div>
         </div>
+
         {/* Action Buttons */}
         <div className="mt-8 flex justify-end items-center">
           <div className="flex items-center space-x-4">
@@ -275,6 +322,13 @@ const AppointmentStep2: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Success Modal */}
+      <AppointmentSuccessModal
+        isOpen={showSuccessModal}
+        appointmentData={appointmentDataForModal}
+        onClose={handleSuccessModalClose}
+      />
     </div>
   );
 };
