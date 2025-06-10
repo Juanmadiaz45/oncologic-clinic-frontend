@@ -10,6 +10,7 @@ import Button from '@/components/ui/Button';
 import { useAppointmentSteps } from '@/hooks/useAppointmentSteps';
 import { useAppointmentStep2 } from '@/hooks/useAppointmentStep2';
 import { ROUTES } from '@/constants';
+import { formatDateForDisplay } from '@/utils/dateUtils';
 
 const AppointmentStep2: React.FC = () => {
   const navigate = useNavigate();
@@ -232,7 +233,10 @@ const AppointmentStep2: React.FC = () => {
                 {step2Data.selectedDoctor?.personalData.lastName}
               </p>
               <p>
-                <strong>Fecha:</strong> {step2Data.selectedDate}
+                <strong>Fecha:</strong>{' '}
+                {step2Data.selectedDate
+                  ? formatDateForDisplay(step2Data.selectedDate)
+                  : 'No seleccionada'}
               </p>
               <p>
                 <strong>Hora:</strong> {step2Data.selectedTimeSlot?.startTime} -{' '}

@@ -1,6 +1,12 @@
 import React from 'react';
 import { CalendarDaysIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { TimeSlot } from '@/types/appointments/step2Types';
+import {
+  formatDateForDisplay,
+  formatDayOfWeek,
+  isTomorrow,
+  getMinimumAppointmentDate,
+} from '@/utils/dateUtils';
 
 interface DateTimeSelectorProps {
   selectedDate: string | null;
@@ -19,22 +25,30 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
   onDateChange,
   onTimeSlotSelect,
 }) => {
-  // Get tomorrow's date as minimum selectable date
-  const getTomorrowDate = () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split('T')[0];
+  const getMinimumDate = () => {
+    return getMinimumAppointmentDate(1);
   };
 
-  // Get formatted date for display
-  const getFormattedDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('es-ES', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+  const getDateDescription = (dateStr: string) => {
+    console.log('🗓️ DateTimeSelector - Procesando fecha:', dateStr);
+
+    const dayOfWeek = formatDayOfWeek(dateStr);
+    const fullDate = formatDateForDisplay(dateStr);
+
+    console.log('🗓️ DateTimeSelector - Día de la semana:', dayOfWeek);
+    console.log('🗓️ DateTimeSelector - Fecha completa:', fullDate);
+
+    if (isTomorrow(dateStr)) {
+      return `Mañana, ${fullDate}`;
+    }
+
+    return fullDate;
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newDate = e.target.value;
+    console.log('🗓️ DateTimeSelector - Fecha seleccionada del input:', newDate);
+    onDateChange(newDate);
   };
 
   return (
@@ -53,16 +67,22 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
             <input
               type="date"
               value={selectedDate || ''}
-              min={getTomorrowDate()}
-              onChange={e => onDateChange(e.target.value)}
+              min={getMinimumDate()}
+              onChange={handleDateChange}
               className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-clinic-500 focus:border-clinic-500 transition-colors duration-200"
             />
             <CalendarDaysIcon className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
           </div>
           {selectedDate && (
-            <p className="mt-2 text-sm text-gray-600">
-              {getFormattedDate(selectedDate)}
-            </p>
+            <div className="mt-2 space-y-1">
+              <p className="text-sm text-gray-600">
+                <strong>Fecha seleccionada:</strong>{' '}
+                {getDateDescription(selectedDate)}
+              </p>
+              <p className="text-xs text-gray-500">
+                Día de la semana: {formatDayOfWeek(selectedDate)}
+              </p>
+            </div>
           )}
         </div>
 
@@ -120,22 +140,25 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
         )}
 
         {/* Selected Time Display */}
-        {selectedTimeSlot && (
+        {selectedTimeSlot && selectedDate && (
           <div className="mt-4 bg-clinic-50 border border-clinic-200 rounded-lg p-4">
             <h4 className="text-sm font-medium text-clinic-800 mb-2">
               Horario Seleccionado
             </h4>
-            <div className="flex items-center space-x-2 text-clinic-700">
-              <ClockIcon className="h-5 w-5" />
-              <span className="font-medium">
-                {selectedTimeSlot.startTime} - {selectedTimeSlot.endTime}
-              </span>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2 text-clinic-700">
+                <ClockIcon className="h-5 w-5" />
+                <span className="font-medium">
+                  {selectedTimeSlot.startTime} - {selectedTimeSlot.endTime}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2 text-clinic-600">
+                <CalendarDaysIcon className="h-4 w-4" />
+                <span className="text-sm">
+                  {getDateDescription(selectedDate)}
+                </span>
+              </div>
             </div>
-            {selectedDate && (
-              <p className="text-sm text-clinic-600 mt-1">
-                {getFormattedDate(selectedDate)}
-              </p>
-            )}
           </div>
         )}
       </div>
