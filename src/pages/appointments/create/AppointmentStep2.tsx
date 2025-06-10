@@ -57,9 +57,7 @@ const AppointmentStep2: React.FC = () => {
   };
 
   const handleDoctorSearchTermChange = (term: string) => {
-    if (term.trim()) {
-      searchDoctors(term);
-    }
+    searchDoctors(term);
   };
 
   const handleSpecialityChange = (specialityId: number | null) => {
@@ -142,13 +140,6 @@ const AppointmentStep2: React.FC = () => {
             <div>
               <span className="font-medium text-gray-900">Paciente:</span>{' '}
               <span className="text-gray-700">{formData.patient.name}</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-900">Tipo:</span>{' '}
-              <span className="text-gray-700">
-                {formData.appointmentTypeId}{' '}
-                {/* You might want to display the actual type name */}
-              </span>
             </div>
             <div>
               <span className="font-medium text-gray-900">Duración:</span>{' '}

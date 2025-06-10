@@ -10,6 +10,7 @@ import {
   selectTimeSlot,
   setSelectedOffice,
   setError,
+  clearAvailableDoctors, // Import new action to clear available doctors
 } from '@/store/slices/appointment';
 import { DoctorResponseDTO, TimeSlot, CreateAppointmentRequest } from '@/types';
 
@@ -34,14 +35,12 @@ export const useAppointmentStep2 = () => {
   const searchDoctors = useCallback(
     (searchTerm: string) => {
       dispatch(setDoctorSearchTerm(searchTerm));
-
-      // If the term is empty, clear the results
       if (searchTerm.trim() === '') {
-        // Clear the list of available doctors
-        dispatch(step2Actions.searchDoctors('')); // This should return empty array
-      } else {
-        dispatch(step2Actions.searchDoctors(searchTerm));
+        dispatch(clearAvailableDoctors());
+        return;
       }
+
+      dispatch(step2Actions.searchDoctors(searchTerm));
     },
     [dispatch]
   );

@@ -28,6 +28,7 @@ export const {
   selectTimeSlot,
   setSelectedOffice,
   clearStep2Data,
+  clearAvailableDoctors, // New action to clear available doctors
 } = appointmentSlice.actions;
 
 export { asyncActions, step2AsyncActions };
