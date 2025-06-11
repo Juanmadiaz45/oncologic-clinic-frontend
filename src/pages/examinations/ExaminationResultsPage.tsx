@@ -107,11 +107,19 @@ export const ExaminationResultsPage: React.FC = () => {
         
       } catch (error) {
         console.error('Error al generar resultado:', error);
+
         // Solo mostrar error si es realmente un error, no si ya existe
-        if (error.status !== 409) { // 409 = Conflict (ya existe)
-          alert('Error al generar el resultado del examen');
+        if (typeof error === 'object' && error !== null && 'status' in error) {
+          const err = error as { status: number };
+
+          if (err.status !== 409) {
+            alert('Error al generar el resultado del examen');
+          } 
+        } else {
+          alert('Error desconocido al generar el resultado del examen');
         }
-      } finally {
+      }     
+      finally {
         setIsGeneratingResult(false);
         setGeneratingExamId(null);
       }
