@@ -55,6 +55,10 @@ export const ROUTES = {
   RESULT_CREATE: '/laboratory/results/create',
   RESULT_EDIT: '/laboratory/results/:id/edit',
 
+  // Patient Examinations
+  PATIENT_EXAMINATION_CREATE: '/patients/:patientId/examinations/create',
+  PATIENT_EXAMINATION_RESULTS: '/patients/:patientId/examinations/results',
+
   // Administration
   USERS: '/administration/users',
   USER_DETAIL: '/administration/users/:id',

@@ -26,6 +26,8 @@ import DoctorDashboard from '@/pages/dashboard/DoctorDashboard';
 import AdministrativeDashboard from '@/pages/dashboard/AdministrativeDashboard';
 import MedicalAppointment from '@/pages/appointments/MedicalAppointment';
 import AdminDashboard from '@/pages/dashboard/AdminDashboard';
+import { ExaminationCreatePage } from './pages/examinations/ExaminationCreatePage';
+import { ExaminationResultsPage } from './pages/examinations/ExaminationResultsPage';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AppointmentStep1 from '@/pages/appointments/create/AppointmentStep1';
 import AppointmentStep2 from '@/pages/appointments/create/AppointmentStep2';
@@ -84,6 +86,23 @@ function App() {
             element={
               <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
                 <PatientMedicalHistoryPage />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/patients/:patientId/examinations/create" 
+            element={
+              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
+                <ExaminationCreatePage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/patients/:patientId/examinations/results" 
+            element={
+              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
+                <ExaminationResultsPage />
               </ProtectedRoute>
             } 
           />
@@ -157,6 +176,24 @@ function App() {
                 <Navigate to={ROUTES.LOGIN} replace />
               )
             }
+          />
+
+          <Route 
+            path="/patients/:patientId/examinations/create" 
+            element={
+              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
+                <ExaminationCreatePage />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/patients/:patientId/examinations/results" 
+            element={
+              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
+                <ExaminationResultsPage />
+              </ProtectedRoute>
+            } 
           />
 
           {/* 404 fallback */}
