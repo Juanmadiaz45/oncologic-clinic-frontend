@@ -1,13 +1,15 @@
-// src/hooks/useAppointments.ts
 import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store';
-import { asyncActions } from '@/store/slices/appointment'; // Import asynchronous actions
+import { asyncActions } from '@/store/slices/appointment';
 import {
   selectPatient,
   selectAppointmentType,
   updateFormData,
   addMedicalTask,
   removeMedicalTask,
+  addCustomMedicalTask,
+  removeCustomMedicalTask,
+  updateCustomMedicalTask,
   nextStep,
   previousStep,
   resetForm,
@@ -16,7 +18,7 @@ import {
   clearValidationErrors,
 } from '@/store/slices/appointment';
 import { AppointmentFormData } from '@/store/slices/appointment/types/formData';
-import { MedicalTask, Patient } from '@/types';
+import { MedicalTask, Patient, CreateMedicalTaskRequest } from '@/types';
 
 export const useAppointments = () => {
   const dispatch = useAppDispatch();
@@ -36,7 +38,7 @@ export const useAppointments = () => {
     validationErrors,
   } = useAppSelector(state => state.appointment);
 
-  // Actions
+  // Existing actions (no changes)
   const actions = {
     // Patient search (now uses asyncActions)
     searchPatients: useCallback(
@@ -115,6 +117,28 @@ export const useAppointments = () => {
       [dispatch]
     ),
 
+    // Nuevas acciones para tareas personalizadas
+    addCustomMedicalTask: useCallback(
+      (task: CreateMedicalTaskRequest) => {
+        dispatch(addCustomMedicalTask(task));
+      },
+      [dispatch]
+    ),
+
+    removeCustomMedicalTask: useCallback(
+      (index: number) => {
+        dispatch(removeCustomMedicalTask(index));
+      },
+      [dispatch]
+    ),
+
+    updateCustomMedicalTask: useCallback(
+      (index: number, task: CreateMedicalTaskRequest) => {
+        dispatch(updateCustomMedicalTask({ index, task }));
+      },
+      [dispatch]
+    ),
+
     resetForm: useCallback(() => {
       dispatch(resetForm());
     }, [dispatch]),
@@ -135,7 +159,7 @@ export const useAppointments = () => {
     }, [dispatch]),
   };
 
-  // Computed values (stays the same)
+  // Computed values (sin cambios)
   const computed = {
     isFormValid: formData.patient && formData.appointmentTypeId,
     canGoNext:
@@ -150,7 +174,7 @@ export const useAppointments = () => {
   };
 
   return {
-    // State (stays the same)
+    // State
     formData,
     currentStep,
     searchResults,
@@ -158,16 +182,16 @@ export const useAppointments = () => {
     error,
     validationErrors,
 
-    // Loading states (stays the same)
+    // Loading states
     isSearchingPatients,
     isLoadingTypes,
     isCalculatingDuration,
     isSaving,
 
-    // Actions (updated)
+    // Actions
     ...actions,
 
-    // Computed (stays the same)
+    // Computed
     ...computed,
   };
 };

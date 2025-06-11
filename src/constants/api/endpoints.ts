@@ -32,7 +32,6 @@ export const API_ENDPOINTS = {
   DOCTORS_SEARCH: '/doctors/search',
   PERSONAL_AVAILABILITIES: '/personal/:personalId/availabilities',
   MEDICAL_OFFICES_AVAILABLE: '/medical-offices/available',
-  SCHEDULE_APPOINTMENT: '/medical-appointments/schedule',
 
   // Medical History
   MEDICAL_HISTORY: '/patients/medical-history',

@@ -76,4 +76,7 @@ export const step2Reducers = {
       availableOffices: [],
     };
   },
+  clearAvailableDoctors: (state: AppointmentState) => {
+    state.formData.step2.availableDoctors = [];
+  },
 };

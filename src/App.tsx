@@ -6,45 +6,13 @@ import {
 } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AppLoadingScreen } from '@/components/ui/AppLoadingScreen';
-import LoginPage from '@/pages/auth/LoginPage';
-import {
-  PatientListPage,
-  PatientCreatePage,
-  PatientEditPage,
-  PatientDetailPage,
-} from '@/pages/patients';
-import {
-  PersonalListPage,
-  DoctorCreatePage,
-  AdministrativeCreatePage,
-  DoctorEditPage,
-  AdministrativeEditPage,
-  DoctorDetailPage,
-  AdministrativeDetailPage,
-} from '@/pages/staff';
-import DoctorDashboard from '@/pages/dashboard/DoctorDashboard';
-import AdministrativeDashboard from '@/pages/dashboard/AdministrativeDashboard';
-import MedicalAppointment from '@/pages/appointments/MedicalAppointment';
-import AdminDashboard from '@/pages/dashboard/AdminDashboard';
-import { ExaminationCreatePage } from './pages/examinations/ExaminationCreatePage';
-import { ExaminationResultsPage } from './pages/examinations/ExaminationResultsPage';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
-import AppointmentStep1 from '@/pages/appointments/create/AppointmentStep1';
-import AppointmentStep2 from '@/pages/appointments/create/AppointmentStep2';
+import { protectedRoutes } from '@/routes/protectedRoutes';
+import { publicRoutes } from '@/routes/publicRoutes';
 import { useAuth } from '@/hooks/useAuth';
-import PatientMedicalHistoryPage from '@/pages/patients/PatientMedicalHistoryPage';
 import { ROUTES } from '@/constants';
 
 function App() {
-  const {
-    initialize,
-    isInitialized,
-    isLoading,
-    isAuthenticated,
-    isAdmin,
-    isDoctor,
-    isAdministrative,
-  } = useAuth();
+  const { initialize, isInitialized, isLoading, isAuthenticated } = useAuth();
 
   // Initialize auth on app start
   useEffect(() => {
@@ -56,117 +24,35 @@ function App() {
     return <AppLoadingScreen />;
   }
 
-  // Helper function to determine which dashboard to show
-  const getDashboardComponent = () => {
-    if (isAdmin) {
-      return <AdminDashboard />;
-    } else if (isDoctor) {
-      return <DoctorDashboard />;
-    } else if (isAdministrative) {
-      return <AdministrativeDashboard />;
-    } else {
-      return <Navigate to={ROUTES.LOGIN} replace />;
-    }
-  };
-
   return (
     <Router>
       <div className="App">
         <Routes>
-          {/* Public Routes */}
-          <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+          {/* =================
+              PUBLIC ROUTES
+              ================= */}
+          {publicRoutes.map((route, index) => (
+            <Route
+              key={`public-${index}`}
+              path={route.path}
+              element={route.element}
+            />
+          ))}
 
-          {/* Patient Routes */}
-          <Route path={ROUTES.PATIENTS} element={<PatientListPage />} />
-          <Route path={ROUTES.PATIENT_CREATE} element={<PatientCreatePage />} />
-          <Route path={ROUTES.PATIENT_EDIT} element={<PatientEditPage />} />
-          <Route path={ROUTES.PATIENT_DETAIL} element={<PatientDetailPage />} />
-          <Route 
-            path="/patients/:id/medical-history" 
-            element={
-              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
-                <PatientMedicalHistoryPage />
-              </ProtectedRoute>
-            } 
-          />
+          {/* =================
+              PROTECTED ROUTES
+              ================= */}
+          {protectedRoutes.map((route, index) => (
+            <Route
+              key={`protected-${index}`}
+              path={route.path}
+              element={route.element}
+            />
+          ))}
 
-          <Route 
-            path="/patients/:patientId/examinations/create" 
-            element={
-              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
-                <ExaminationCreatePage />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/patients/:patientId/examinations/results" 
-            element={
-              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
-                <ExaminationResultsPage />
-              </ProtectedRoute>
-            } 
-          />
-
-          {/* Personal Routes */}
-          <Route path={ROUTES.PERSONAL} element={<PersonalListPage />} />
-          <Route path="/staff/personal" element={<PersonalListPage />} />
-
-          {/* Doctor Routes */}
-          <Route path={ROUTES.DOCTOR_CREATE} element={<DoctorCreatePage />} />
-          <Route path="/staff/doctors/:id/edit" element={<DoctorEditPage />} />
-          <Route path="/staff/doctors/:id" element={<DoctorDetailPage />} />
-
-          {/* Administrative Routes */}
-          <Route
-            path={ROUTES.ADMINISTRATIVE_CREATE}
-            element={<AdministrativeCreatePage />}
-          />
-          <Route
-            path="/staff/administrative/:id/edit"
-            element={<AdministrativeEditPage />}
-          />
-          <Route
-            path="/staff/administrative/:id"
-            element={<AdministrativeDetailPage />}
-          />
-          <Route
-            path="/appointments/create/step2"
-            element={<AppointmentStep2 />}
-          />
-
-          {/* Protected Routes */}
-          <Route
-            path={ROUTES.DASHBOARD}
-            element={
-              <ProtectedRoute roles={['ADMIN', 'DOCTOR', 'ADMINISTRATIVE']}>
-                {getDashboardComponent()}
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Default redirect */}
-          {/* Appointment Routes */}
-          <Route
-            path={ROUTES.APPOINTMENT_CREATE_STEP1}
-            element={
-              <ProtectedRoute
-                children={<AppointmentStep1 />}
-                roles={['ADMIN', 'DOCTOR', 'ADMINISTRATIVE']}
-              ></ProtectedRoute>
-            }
-          />
-
-          {/* Medical Appointment Route */}
-          <Route
-            path="/medical-appointment/:appointmentId"
-            element={
-              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
-                <MedicalAppointment />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Dashboard with navigation */}
+          {/* =================
+              NAVIGATION ROUTES
+              ================= */}
           <Route
             path="/"
             element={
@@ -176,24 +62,6 @@ function App() {
                 <Navigate to={ROUTES.LOGIN} replace />
               )
             }
-          />
-
-          <Route 
-            path="/patients/:patientId/examinations/create" 
-            element={
-              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
-                <ExaminationCreatePage />
-              </ProtectedRoute>
-            } 
-          />
-
-          <Route 
-            path="/patients/:patientId/examinations/results" 
-            element={
-              <ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
-                <ExaminationResultsPage />
-              </ProtectedRoute>
-            } 
           />
 
           {/* 404 fallback */}

@@ -29,11 +29,26 @@ export const DoctorSearch: React.FC<DoctorSearchProps> = ({
   onDoctorSelect,
 }) => {
   const [searchType, setSearchType] = useState<'name' | 'speciality'>('name');
+  const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
 
   const handleSearchTypeChange = (type: 'name' | 'speciality') => {
     setSearchType(type);
     onSearchTermChange('');
     onSpecialityChange(null);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    console.log('🔍 DoctorSearch - Input onChange:', {
+      oldValue: localSearchTerm,
+      newValue: newValue,
+      oldLength: localSearchTerm.length,
+      newLength: newValue.length,
+      keyPressed: 'input_change',
+    });
+
+    setLocalSearchTerm(newValue);
+    onSearchTermChange(newValue);
   };
 
   return (
@@ -73,7 +88,7 @@ export const DoctorSearch: React.FC<DoctorSearchProps> = ({
             <input
               type="text"
               value={searchTerm}
-              onChange={e => onSearchTermChange(e.target.value)}
+              onChange={handleInputChange}
               placeholder="Buscar doctor por nombre..."
               className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-clinic-500 focus:border-clinic-500 transition-colors duration-200"
             />

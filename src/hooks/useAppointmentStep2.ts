@@ -10,6 +10,7 @@ import {
   selectTimeSlot,
   setSelectedOffice,
   setError,
+  clearAvailableDoctors, // Import new action to clear available doctors
 } from '@/store/slices/appointment';
 import { DoctorResponseDTO, TimeSlot, CreateAppointmentRequest } from '@/types';
 
@@ -34,9 +35,12 @@ export const useAppointmentStep2 = () => {
   const searchDoctors = useCallback(
     (searchTerm: string) => {
       dispatch(setDoctorSearchTerm(searchTerm));
-      if (searchTerm.trim()) {
-        dispatch(step2Actions.searchDoctors(searchTerm));
+      if (searchTerm.trim() === '') {
+        dispatch(clearAvailableDoctors());
+        return;
       }
+
+      dispatch(step2Actions.searchDoctors(searchTerm));
     },
     [dispatch]
   );
@@ -127,12 +131,19 @@ export const useAppointmentStep2 = () => {
       appointmentDate: `${step2Data.selectedDate}T${
         step2Data.selectedTimeSlot!.startTime
       }:00`,
-      medicalHistoryId: formData.patient!.medicalHistory?.id,
+      medicalHistoryId: formData.patient!.medicalHistory.id!,
       medicalOfficeId: step2Data.selectedOfficeId!,
-      medicalTaskIds: [],
+      medicalTaskIds: [], // It will be filled automatically when creating tasks
     };
-
-    await dispatch(step2Actions.createAppointment(appointmentData));
+    // Use the new action that creates the tasks first and then the appointment
+    await dispatch(
+      step2Actions.createAppointmentWithTasks({
+        appointmentData,
+        templateTasks: formData.medicalTasks,
+        customTasks: formData.customMedicalTasks,
+        appointmentDuration: formData.duration,
+      })
+    );
   }, [dispatch, step2Data, formData, isCreatingAppointment]);
 
   const handleSetError = useCallback(

@@ -80,9 +80,9 @@ const appointmentSlice = createSlice({
       .addCase(asyncActions.saveAppointment.fulfilled, state => {
         state.isSaving = false;
         state.error = null;
-        // Reset form after successful saving
-        state.formData = initialState.formData;
-        state.currentStep = 1;
+        // ❌ REMOVIDO: No resetear el formulario automáticamente
+        // state.formData = initialState.formData;
+        // state.currentStep = 1;
       })
       .addCase(asyncActions.saveAppointment.rejected, (state, action) => {
         state.isSaving = false;
@@ -169,15 +169,59 @@ const appointmentSlice = createSlice({
       })
       .addCase(step2AsyncActions.createAppointment.fulfilled, state => {
         state.isCreatingAppointment = false;
-        // Reset form after successful creation
-        state.formData = initialState.formData;
-        state.currentStep = 1;
+        // ❌ REMOVIDO: No resetear el formulario automáticamente
+        // state.formData = initialState.formData;
+        // state.currentStep = 1;
       })
       .addCase(
         step2AsyncActions.createAppointment.rejected,
         (state, action) => {
           state.isCreatingAppointment = false;
           state.error = action.error.message || 'Error creating appointment';
+        }
+      );
+
+    builder
+      .addCase(
+        step2AsyncActions.createMedicalTasksForAppointment.pending,
+        state => {
+          state.isCreatingAppointment = true;
+        }
+      )
+      .addCase(
+        step2AsyncActions.createMedicalTasksForAppointment.fulfilled,
+        () => {
+          // We don't need to do anything special here, just continue.
+        }
+      )
+      .addCase(
+        step2AsyncActions.createMedicalTasksForAppointment.rejected,
+        (state, action) => {
+          state.isCreatingAppointment = false;
+          state.error = action.error.message || 'Error creating medical tasks';
+        }
+      );
+
+    // Create appointment with tasks - ✅ ESTE ES EL IMPORTANTE
+    builder
+      .addCase(step2AsyncActions.createAppointmentWithTasks.pending, state => {
+        state.isCreatingAppointment = true;
+      })
+      .addCase(
+        step2AsyncActions.createAppointmentWithTasks.fulfilled,
+        state => {
+          state.isCreatingAppointment = false;
+          state.error = null;
+          // ✅ CAMBIADO: No resetear el formulario automáticamente
+          // Permitir que el componente maneje cuándo resetear
+        }
+      )
+      .addCase(
+        step2AsyncActions.createAppointmentWithTasks.rejected,
+        (state, action) => {
+          state.isCreatingAppointment = false;
+          state.error =
+            action.error.message || 'Error creating appointment with tasks';
         }
       );
   },

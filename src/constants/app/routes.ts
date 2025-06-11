@@ -69,4 +69,8 @@ export const ROUTES = {
   ROLE_DETAIL: '/administration/roles/:id',
   ROLE_CREATE: '/administration/roles/create',
   ROLE_EDIT: '/administration/roles/:id/edit',
+  
+  // Helper functions para generar rutas dinámicas
+  PATIENT_EXAMINATIONS_CREATE_VIEW: (patientId: number) => `/patients/${patientId}/examinations/create`,
+  PATIENT_EXAMINATIONS_RESULTS_VIEW: (patientId: number) => `/patients/${patientId}/examinations/results`,
 } as const;
