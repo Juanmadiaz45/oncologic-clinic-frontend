@@ -65,4 +65,19 @@ export const API_ENDPOINTS = {
 
   // Dashboard
   DOCTOR_DASHBOARD: '/doctor-dashboard',
+
+  // Laboratory
+  EXAMINATIONS: '/laboratory/examinations',
+  EXAMINATION_DETAIL: '/laboratory/examinations/:id',
+  EXAMINATION_CREATE: '/laboratory/examinations/create',
+  EXAMINATION_EDIT: '/laboratory/examinations/:id/edit',
+
+  RESULTS: '/laboratory/results',
+  RESULT_DETAIL: '/laboratory/results/:id',
+  RESULT_CREATE: '/laboratory/results/create',
+  RESULT_EDIT: '/laboratory/results/:id/edit',
+
+  // Patient Examinations
+  PATIENT_EXAMINATION_CREATE: '/patients/:patientId/examinations/create',
+  PATIENT_EXAMINATION_RESULTS: '/patients/:patientId/examinations/results',
 } as const;

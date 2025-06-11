@@ -374,20 +374,27 @@ const PatientMedicalHistoryPage: React.FC = () => {
         <div className="mt-8">
           <Card title="Acciones Rápidas">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Button
-                  variant="primary"
-                  className="w-full justify-center"
-                  onClick={() => alert('Función próximamente disponible')}
-              >
-                  📅 Nueva Cita
-              </Button>
-              <Button
+                <Button
+                    variant="primary"
+                    className="w-full justify-center"
+                    onClick={() => alert('Función próximamente disponible')}
+                >
+                    📅 Nueva Cita
+                </Button>
+                <Button
                   variant="secondary"
                   className="w-full justify-center"
-                  onClick={() => alert('Función próximamente disponible')}
-              >
-                  🔬 Nuevo Examen
-              </Button>
+                  onClick={() => navigate(`/patients/${patientId}/examinations/results`)}
+                >
+                    📋 Ver Resultados de Exámenes
+                </Button>
+                <Button
+                  variant="primary"
+                  className="w-full justify-center"
+                  onClick={() => navigate(`/patients/${patient.id}/examinations/create`)}
+                >
+                    🧪 Nuevo Examen Médico
+                </Button>
               </div>
           </Card>
         </div>

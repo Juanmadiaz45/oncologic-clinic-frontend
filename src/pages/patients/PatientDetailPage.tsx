@@ -295,11 +295,11 @@ const PatientDetailPage: React.FC = () => {
                   📅 Nueva Cita
                 </Button>
                 <Button
-                  variant="secondary"
+                  variant="primary"
                   className="w-full justify-center"
-                  onClick={() => alert('Función próximamente disponible')}
+                  onClick={() => navigate(`/patients/${patient.id}/examinations/create`)}
                 >
-                  🔬 Nuevo Examen
+                  🧪 Nuevo Examen Médico
                 </Button>
                 <Button
                   variant="secondary"

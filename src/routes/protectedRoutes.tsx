@@ -21,6 +21,8 @@ import AppointmentStep1 from '@/pages/appointments/create/AppointmentStep1';
 import AppointmentStep2 from '@/pages/appointments/create/AppointmentStep2';
 import PatientMedicalHistoryPage from '@/pages/patients/PatientMedicalHistoryPage';
 import { DashboardRouter } from '@/components/dashboard/DashboardRouter';
+import { ExaminationCreatePage } from '@/pages/examinations/ExaminationCreatePage';
+import { ExaminationResultsPage } from '@/pages/examinations/ExaminationResultsPage';
 
 export const protectedRoutes = createProtectedRoutes([
   // =================
@@ -58,7 +60,7 @@ export const protectedRoutes = createProtectedRoutes([
   {
     path: '/patients/:id/medical-history',
     element: <PatientMedicalHistoryPage />,
-    roles: [ROLES.ADMIN, ROLES.DOCTOR],
+    roles: [ROLES.ADMIN, ROLES.DOCTOR, ROLES.ADMINISTRATIVE],
   },
 
   // =================
@@ -125,5 +127,19 @@ export const protectedRoutes = createProtectedRoutes([
     path: ROUTES.MEDICAL_APPOINTMENT,
     element: <MedicalAppointment />,
     roles: [ROLES.ADMIN, ROLES.DOCTOR, ROLES.ADMINISTRATIVE],
+  },
+
+  // =================
+  // MEDICAL EXAMINATION ROUTES
+  // =================
+  {
+    path: ROUTES.PATIENT_EXAMINATION_CREATE,
+    element: <ExaminationCreatePage />,
+    roles: [ROLES.ADMIN, ROLES.DOCTOR],
+  },
+  {
+    path: ROUTES.PATIENT_EXAMINATION_RESULTS,
+    element: <ExaminationResultsPage />,
+    roles: [ROLES.ADMIN, ROLES.DOCTOR],
   },
 ]);

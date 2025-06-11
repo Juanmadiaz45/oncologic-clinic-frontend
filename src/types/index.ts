@@ -19,3 +19,8 @@ export * from './appointments';
 
 // Dashboard
 export * from './dashboard';
+
+// Examinations
+export * from './examinations';
+
+export * from './medicalHistory';
