@@ -25,7 +25,7 @@ function App() {
   }
 
   return (
-    <Router>
+    <Router basename="/g5/syscom">
       <div className="App">
         <Routes>
           {/* =================

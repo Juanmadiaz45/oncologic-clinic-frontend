@@ -18,9 +18,18 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
           {/* Header */}
           <div className="px-6 py-6 text-center">
             <img
-              src="../../../oncologic-logo-without-background.png"
+              src={`${
+                import.meta.env.BASE_URL
+              }oncologic-logo-without-background.png`}
               alt="Clínica OncoLogic Logo"
               className="mx-auto h-20 w-auto"
+              onError={e => {
+                // ✅ Fallback in case the image is not found
+                e.currentTarget.style.display = 'none';
+                console.warn(
+                  'Logo no encontrado en /public/oncologic-logo-without-background.png'
+                );
+              }}
             />
             <h3 className="mt-4 text-2xl font-semibold text-blue-600">
               {title}
