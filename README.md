@@ -1,215 +1,372 @@
-# Clínica OncoLogic - Frontend
+# OncoLogic Clinic - Frontend
 
-Sistema de gestión para clínica oncológica desarrollado con React + TypeScript + Vite.
+A comprehensive medical clinic management system designed specifically for oncology practices, built with modern React technologies.
 
-## 🚀 Tecnologías
+## 🖼️ Application Screenshots
 
-- **React 18** con TypeScript
-- **Vite** como build tool
-- **React Router DOM** para navegación
-- **Redux Toolkit + RTK Query** para estado global
-- **Tailwind CSS** para estilos
-- **Axios** para HTTP requests
-- **ESLint + Prettier** para calidad de código
-- **Husky** para git hooks
+![Welcome Dashboard](/public/images/image-3.png)
+_Main dashboard with role-based navigation and quick access to key features_
 
-## Authors
+![Patient Registration](/public/images/image-1.png)
+_Comprehensive patient registration form with medical history integration_
 
-- Santiago Valencia - A00395902
-- Juan Manuel Díaz - A00394477
-- Esteban Gaviria - A00396019
+![Admin Panel](/public/images/image-2.png)
+_Administrative dashboard with system management capabilities_
 
-## 📁 Estructura del Proyecto
+![Administrative Staff Panel](/public/images/image-4.png)
+_Specialized interface for administrative personnel_
+
+![Patient Management](/public/images/image-5.png)
+_Advanced patient listing with search, filters, and pagination_
+
+![Medical Appointment Creation](/public/images/image-6.png)
+_Intuitive appointment scheduling system with conflict detection_
+
+![Doctor Dashboard](/public/images/image-7.png)
+_Doctor's workspace with patient management and medical records_
+
+## 🚀 Technology Stack
+
+### Core Technologies
+
+- **React 18** with TypeScript for type-safe component development
+- **Vite** as build tool and development server
+- **React Router DOM v7** for client-side routing
+- **Redux Toolkit** with RTK Query for state management and API caching
+- **Axios** with custom interceptors for HTTP requests
+- **Tailwind CSS** with custom design system
+
+### Developer Experience
+
+- **ESLint** with TypeScript rules and React hooks plugin
+- **Prettier** for consistent code formatting
+- **Husky** with pre-commit and pre-push hooks
+- **TypeScript 5.8** with strict mode enabled
+- **Vite** with Hot Module Replacement (HMR)
+
+### UI/UX Libraries
+
+- **@headlessui/react** for accessible, unstyled UI components
+- **@heroicons/react** for consistent iconography
+- **Custom Tailwind components** for design consistency
+
+## 👥 Development Team
+
+- **Santiago Valencia** - A00395902
+- **Juan Manuel Díaz** - A00394477
+- **Esteban Gaviria** - A00396019
+
+## 🏗️ Project Architecture
+
+### Directory Structure
 
 ```
 src/
-├── components/           # Componentes reutilizables
-│   ├── ui/              # Componentes base (Button, Input, Modal, etc.)
-│   ├── forms/           # Formularios específicos del dominio
-│   ├── tables/          # Componentes de tablas reutilizables
+├── components/           # Reusable React components
+│   ├── ui/              # Base components (Button, Input, Modal, etc.)
+│   ├── forms/           # Domain-specific forms
+│   ├── tables/          # Reusable table components with pagination
 │   └── layout/          # Layout components (Header, Sidebar, etc.)
-├── pages/               # Páginas de la aplicación
-│   ├── auth/            # Autenticación (Login, etc.)
-│   ├── dashboard/       # Dashboard principal
-│   ├── patients/        # Gestión de pacientes
-│   ├── appointments/    # Gestión de citas médicas
-│   ├── staff/           # Gestión de personal
-│   │   ├── doctors/     # Doctores
-│   │   ├── administrative/ # Personal administrativo
-│   │   └── specialities/ # Especialidades médicas
-│   ├── laboratory/      # Laboratorio
-│   │   ├── examinations/ # Exámenes médicos
-│   │   └── results/     # Resultados de exámenes
-│   └── administration/ # Administración del sistema
-│       ├── users/       # Gestión de usuarios
-│       └── roles/       # Gestión de roles
+├── pages/               # Application pages
+│   ├── auth/            # Authentication (Login, Register, etc.)
+│   ├── dashboard/       # Role-based dashboards
+│   ├── patients/        # Patient management
+│   ├── appointments/    # Medical appointment scheduling
+│   ├── staff/           # Staff management
+│   │   ├── doctors/     # Doctor management
+│   │   ├── administrative/ # Administrative staff
+│   │   └── specialities/ # Medical specialties
+│   ├── laboratory/      # Laboratory management
+│   │   ├── examinations/ # Medical examinations
+│   │   └── results/     # Test results
+│   └── administration/ # System administration
+│       ├── users/       # User management
+│       └── roles/       # Role management
 ├── hooks/               # Custom React hooks
-├── services/           # Servicios de API y utilidades
-│   ├── api/            # Configuración de Axios y endpoints
-│   └── auth/           # Servicios de autenticación
-├── store/              # Redux store
-│   └── slices/         # Redux slices
-├── types/              # Definiciones de TypeScript
-│   ├── api/            # Tipos para APIs
-│   └── auth/           # Tipos para autenticación
-├── utils/              # Funciones utilitarias
-├── constants/          # Constantes de la aplicación
-└── assets/             # Recursos estáticos
-    ├── images/         # Imágenes
-    └── icons/          # Iconos
+├── services/           # API services and utilities
+│   ├── api/            # Axios configuration and API client
+│   └── auth/           # Authentication services with JWT
+├── store/              # Redux store configuration
+│   └── slices/         # Redux Toolkit slices
+├── types/              # TypeScript type definitions
+│   ├── core/           # Core types (API, forms, UI)
+│   ├── auth/           # Authentication types
+│   └── patients/       # Patient-related types
+├── utils/              # Utility functions
+├── constants/          # Application constants
+│   ├── api/            # API endpoints and configuration
+│   ├── app/            # Application constants
+│   ├── auth/           # Authentication constants
+│   ├── enums/          # Enumerated types
+│   └── formats/        # Date and format constants
+└── assets/             # Static assets
+    ├── images/         # Image files
+    └── icons/          # Icon files
 ```
 
-## 🏗️ Arquitectura
+## ⚙️ Key Features
 
-### Componentes
+### Authentication & Authorization
 
-- **UI Components**: Componentes base reutilizables (botones, inputs, modales)
-- **Form Components**: Formularios específicos para cada entidad del dominio
-- **Table Components**: Tablas reutilizables con paginación, filtros, etc.
-- **Layout Components**: Estructura general de la aplicación
+- **JWT-based authentication** with automatic token refresh
+- **Role-based access control** (RBAC) with four distinct roles:
+  - **ADMIN**: Full system access and configuration
+  - **DOCTOR**: Patient care, medical records, appointments
+  - **ADMINISTRATIVE**: Patient registration, appointment scheduling
+  - **PATIENT**: Personal medical information access
+- **Protected routes** with role validation
+- **Session management** with automatic logout on token expiration
 
-### Páginas
+### Medical Management
 
-Organizadas por dominio funcional:
+- **Comprehensive patient profiles** with medical history
+- **Appointment scheduling system** with conflict detection
+- **Medical examination tracking** and results management
+- **Laboratory test integration** with result tracking
+- **Medical staff speciality management**
 
-- **Auth**: Manejo de autenticación
-- **Dashboard**: Panel principal con métricas
-- **Patients**: CRUD de pacientes e historiales médicos
-- **Appointments**: Gestión de citas médicas
-- **Staff**: Gestión de personal (doctores, administrativos, especialidades)
-- **Laboratory**: Exámenes y resultados de laboratorio
-- **Administration**: Gestión de usuarios y roles del sistema
+### Technical Features
 
-### Estado Global
+- **Responsive design** optimized for desktop and mobile
+- **Real-time form validation** with TypeScript integration
+- **Advanced search and filtering** across all data entities
+- **Pagination and sorting** for large datasets
+- **File upload capabilities** for medical documents
+- **Data export functionality** for reports
+- **Comprehensive error handling** with user-friendly messages
 
-- **Redux Toolkit** para manejo de estado complejo
-- **RTK Query** para cache de datos de API
-- **React Context** para autenticación
+## 🛠️ Installation & Setup
 
-### Servicios
+### Prerequisites
 
-- **API Services**: Configuración centralizada de Axios
-- **Auth Services**: Manejo de tokens JWT y autenticación
+- Node.js 18+ and npm
+- Git for version control
 
-## 🔧 Instalación y Configuración
+### Development Setup
 
-1. Clonar el repositorio
-2. Instalar dependencias:
+1. **Clone the repository**
+
+   ```bash
+   git clone [repository-url]
+   cd oncologic-clinic-frontend
+   ```
+
+2. **Install dependencies**
 
    ```bash
    npm install
    ```
 
-3. Configurar variables de entorno:
+3. **Environment configuration**
 
    ```bash
    cp .env.example .env
-   # Editar .env con la configuración local
    ```
 
-4. Ejecutar en modo desarrollo:
+   Edit `.env` file with your configuration:
+
+   ```env
+   VITE_API_BASE_URL=http://localhost:8080/g5/siscom/api
+   VITE_APP_NAME=OncoLogic Clinic
+   VITE_NODE_ENV=development
+   ```
+
+4. **Start development server**
    ```bash
    npm run dev
    ```
+   Application will be available at `http://localhost:3000`
 
-## 📝 Scripts Disponibles
+## 📜 Available Scripts
 
-- `npm run dev` - Servidor de desarrollo
-- `npm run build` - Build de producción
-- `npm run preview` - Preview del build
-- `npm run lint` - Ejecutar ESLint
-- `npm run lint:fix` - Arreglar problemas de ESLint automáticamente
-- `npm run format` - Formatear código con Prettier
-- `npm run type-check` - Verificar tipos de TypeScript
+| Command           | Description                       |
+| ----------------- | --------------------------------- |
+| `npm run dev`     | Start development server with HMR |
+| `npm run build`   | Create production build           |
+| `npm run preview` | Preview production build locally  |
+| `npm run lint`    | Run ESLint checks                 |
+| `npm run prepare` | Set up Husky git hooks            |
 
-## 🔐 Autenticación y Autorización
+## 🔐 Authentication System
 
-El sistema implementa autenticación basada en JWT con los siguientes roles:
+### JWT Implementation
 
-- **ADMIN**: Acceso completo al sistema
-- **DOCTOR**: Acceso a pacientes, citas, historiales
-- **ADMINISTRATIVE**: Acceso limitado según permisos
-- **PATIENT**: Acceso solo a su información personal
+- **Secure token storage** in memory during session
+- **Automatic token inclusion** in API requests via Axios interceptors
+- **Token expiration handling** with automatic logout
+- **Role extraction** from JWT payload for authorization
 
-### Rutas Protegidas
-
-Las rutas están protegidas por roles usando el componente `ProtectedRoute`:
+### Protected Routes Example
 
 ```tsx
-<ProtectedRoute roles={["ADMIN", "DOCTOR"]}>
-  <PatientsPage />
-</ProtectedRoute>
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+
+<ProtectedRoute roles={['ADMIN', 'DOCTOR']}>
+  <PatientManagementPage />
+</ProtectedRoute>;
 ```
 
-## 🎨 Estilos y UI
+### Permission System
 
-### Tailwind CSS
+```tsx
+// Role-based permission checking
+const authService = useAuthService();
 
-Utilizamos Tailwind CSS con un sistema de colores personalizado:
-
-- **Primary**: Azules para acciones principales
-- **Secondary**: Grises para elementos secundarios
-- **Success**: Verde para estados exitosos
-- **Warning**: Amarillo para advertencias
-- **Error**: Rojo para errores
-
-### Componentes UI
-
-Todos los componentes UI son accesibles y siguen las mejores prácticas:
-
-- Soporte para screen readers
-- Navegación por teclado
-- Estados de focus visibles
-- Contraste de colores adecuado
-
-## 🧪 Pruebas
-
-```bash
-# Ejecutar pruebas
-npm run test
-
-# Ejecutar pruebas en modo watch
-npm run test:watch
-
-# Coverage de pruebas
-npm run test:coverage
+if (authService.hasPermission('patients:create')) {
+  // Render create patient button
+}
 ```
 
-## 🚀 Despliegue
+## 🎨 Design System
 
-El proyecto está configurado para despliegue en Tomcat (requerimiento del taller):
+### Tailwind CSS Configuration
+
+- **Custom color palette** optimized for medical applications
+- **Consistent spacing scale** following design system principles
+- **Responsive breakpoints** for all device sizes
+- **Dark mode support** (configurable)
+
+### Color Scheme
+
+```css
+Primary: Blue tones for primary actions and navigation
+Secondary: Gray scales for secondary elements
+Success: Green for positive states and confirmations
+Warning: Amber for cautions and important notices
+Error: Red for errors and dangerous actions
+```
+
+### Component Library
+
+- **Accessible components** with ARIA labels and keyboard navigation
+- **Consistent styling** across all interface elements
+- **Loading states** and skeleton screens for better UX
+- **Form validation** with real-time feedback
+
+## 🔗 API Integration
+
+### Backend Integration
+
+- **Base URL**: `http://localhost:8080/g5/siscom/api`
+- **Authentication**: Bearer token in Authorization header
+- **Error handling**: Centralized error management with user notifications
+- **Request/Response interceptors**: Automatic token management and logging
+
+### Key Endpoints
+
+```typescript
+// Authentication endpoints
+POST /auth/login              // User authentication
+GET  /auth/me                 // Current user information
+
+// Patient management
+GET    /users/patients        // List all patients
+POST   /users/patients        // Create new patient
+PUT    /users/patients/:id    // Update patient
+DELETE /users/patients/:id    // Delete patient
+
+// Appointments
+GET    /medical-appointments  // List appointments
+POST   /medical-appointments  // Create appointment
+PUT    /medical-appointments/:id // Update appointment
+
+// Laboratory
+GET    /medical-examinations  // List examinations
+POST   /examination-results   // Submit test results
+```
+
+## 🧪 Testing & Quality Assurance
+
+### Code Quality Tools
+
+- **ESLint**: Configured with React, TypeScript, and accessibility rules
+- **Prettier**: Consistent code formatting across the team
+- **Husky**: Git hooks for pre-commit linting and pre-push building
+- **TypeScript**: Strict mode enabled for maximum type safety
+
+### Development Workflow
 
 ```bash
-# Build para producción
+# Pre-commit: Runs ESLint and Prettier
+# Pre-push: Runs TypeScript compilation and build
+```
+
+## 🚀 Deployment
+
+### Production Build
+
+```bash
 npm run build
-
-# Los archivos se generan en /dist
-# Copiar contenido de /dist al servidor Tomcat
 ```
 
-## 🔄 Integración con Backend
+### Tomcat Deployment
 
-La aplicación se conecta al backend Spring Boot a través de:
+The application is configured for deployment on Apache Tomcat:
 
-- **Base URL**: `http://localhost:8080/api`
-- **Autenticación**: JWT tokens en headers
-- **Interceptores**: Manejo automático de tokens y errores
+1. **Build the application**
 
-### Endpoints Principales
+   ```bash
+   npm run build
+   ```
 
-- `POST /api/auth/login` - Autenticación
-- `GET /api/users/patients` - Obtener pacientes
-- `POST /api/medical-appointments` - Crear citas
-- `GET /api/doctors` - Obtener doctores
-- Y muchos más...
+2. **Deploy to Tomcat**
+   - Copy contents of `dist/` folder to Tomcat webapps directory
+   - Configure reverse proxy for API calls to Spring Boot backend
+   - Ensure proper MIME types are configured for SPA routing
 
-## 📋 Convenciones de Código
+### Environment Variables
 
-- **Naming**: camelCase para variables, PascalCase para componentes
-- **Files**: kebab-case para archivos, PascalCase para componentes
-- **Imports**: Absolute imports usando aliases (@/...)
-- **Types**: Interfaces con sufijo "Interface" si es necesario
+```env
+# Production environment
+VITE_API_BASE_URL=https://your-api-domain.com/api
+VITE_APP_NAME=OncoLogic Clinic
+VITE_NODE_ENV=production
+```
 
-## 📄 Licencia
+## 📊 Performance Features
 
-Este proyecto es privado y confidencial.
+- **Code splitting** with React lazy loading
+- **Bundle optimization** with Vite's tree shaking
+- **Image optimization** and lazy loading
+- **API response caching** with RTK Query
+- **Memoized components** to prevent unnecessary re-renders
+
+## 🔧 Development Guidelines
+
+### Code Standards
+
+- **Naming Conventions**:
+  - camelCase for variables and functions
+  - PascalCase for React components
+  - kebab-case for file names
+- **Import Organization**: Absolute imports using `@/` aliases
+- **Component Structure**: Functional components with TypeScript
+- **State Management**: Redux Toolkit for global state, React state for local
+
+### Git Workflow
+
+- Feature branches from `main`
+- Pull request reviews required
+- Automated testing on PR creation
+- Squash and merge strategy
+
+## 📈 Future Enhancements
+
+- **Real-time notifications** with WebSocket integration
+- **Advanced reporting** and analytics dashboard
+- **Mobile application** development
+- **Telemedicine features** for remote consultations
+- **Integration with medical devices** and IoT sensors
+- **Multi-language support** for international deployment
+
+## 📄 License
+
+This project is proprietary and confidential. All rights reserved.
+
+## 🤝 Contributing
+
+This is a private project developed by the specified team members. For internal development guidelines and contribution processes, please refer to the internal documentation.
+
+---
+
+**OncoLogic Clinic** - Empowering healthcare professionals with modern technology solutions.
