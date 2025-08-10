@@ -2,6 +2,12 @@
 
 A comprehensive medical clinic management system designed specifically for oncology practices, built with modern React technologies.
 
+### Authors
+
+- [Santiago Valencia](https://github.com/Tiago0507)
+- [Juan Manuel Díaz](https://github.com/Juanmadiaz45)
+- [Esteban Gaviria](https://github.com/EstebanGZam)
+
 ## 🖼️ Application Screenshots
 
 ![Welcome Dashboard](/public/images/image-3.png)
